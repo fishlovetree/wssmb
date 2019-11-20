@@ -1,0 +1,233 @@
+.icon-blank{
+	background:url('images/datebox_arrow.png') no-repeat center center;
+}
+.icon-activities{
+	background:url('images/Activities.gif') no-repeat center center;
+}
+.icon-home{
+	background:url('images/home.png') no-repeat center center;
+}
+.icon-opeanaccount{
+	background:url('images/opeanaccount.png') no-repeat center center;
+}
+.icon-mcard{
+	background:url('images/credit_card.png') no-repeat center center;
+}
+.icon-Lightning{
+	background:url('images/Page_Lightning.png') no-repeat center center;
+}
+.icon-money{
+	background:url('images/money.png') no-repeat center center;
+}
+.icon-uimenu{
+	background:url('images/ui-menu-blue.png') no-repeat center center;
+}
+.icon-tag{
+	background:url('images/tag.png') no-repeat center center;
+}
+.icon-readCard{
+	background:url('images/read_card.png')no-repeat center center;
+}
+.icon-meterinfo{
+	background:url('images/meterinfo.png') no-repeat center center;
+}
+.icon-user{
+	background:url('images/user.png')no-repeat center center;
+}
+.icon-wallet{
+	background:url('images/wallet.png') no-repeat center center;
+}
+.icon-set{
+	background:url('images/set.png') no-repeat center center;
+}
+.icon-money_dollar{
+	background:url('images/money_dollar.png') no-repeat center center;
+}
+.icon-card{
+	background:url('images/card.png') no-repeat center center;
+}
+.icon-page_save{
+	background:url('images/page_save.png') no-repeat center center;
+}
+.icon-overlays{
+	background:url('images/overlays.png') no-repeat center center;
+}
+.icon-page_link{
+	background:url('images/page_link.png') no-repeat center center;
+}
+.icon-Products{
+	background:url('images/Products.gif') no-repeat center center;
+}
+.icon-log{
+	background:url('images/Notes.gif') no-repeat center center;
+}
+.icon-syslog{
+	background:url('images/syslog.png') no-repeat center center;
+}
+.icon-myaccount{
+	background:url('images/myaccount.png') no-repeat center center;
+}
+.icon-report{
+	background:url('images/report.png') no-repeat center center;
+}
+.icon-diagram{
+	background:url('images/diagram.png') no-repeat center center;
+}
+.icon-contacts{
+	background:url('images/contacts.png') no-repeat center center;
+}
+.icon-errorlog{
+	background:url('images/errorlog.png') no-repeat center center;
+}
+.icon-employees{
+	background:url('images/Employees.gif') no-repeat center center;
+}
+.icon-Contacts{
+	background:url('images/Contacts.gif') no-repeat center center;
+}
+.icon-data{
+	background:url('images/Tasks.gif') no-repeat center center;
+}
+.icon-role{
+	background:url('images/key.png') no-repeat center center;
+}
+.icon-account{
+	background:url('images/page.png') no-repeat center center;
+}
+.icon-add{
+	background:url('images/edit_add.png') no-repeat center center;
+}
+.icon-edit{
+	background:url('images/pencil.png') no-repeat center center;
+}
+.icon-doclear{
+	background:url('images/clear.png') no-repeat center center;
+}
+.icon-clear{
+	background:url('images/clear.png') no-repeat center center;
+}
+.icon-remove{
+	background:url('images/edit_remove.png') no-repeat center center;
+}
+.icon-save{
+	background:url('images/filesave.png') no-repeat center center;
+}
+.icon-cut{
+	background:url('images/cut.png') no-repeat center center;
+}
+.icon-ok{
+	background:url('images/ok.png') no-repeat center center;
+}
+.icon-no{
+	background:url('images/no.png') no-repeat center center;
+}
+.icon-cancel{
+	background:url('images/cancel.png') no-repeat center center;
+}
+.icon-reload{
+	background:url('images/reload.png') no-repeat center center;
+}
+.icon-search{
+	background:url('images/search.png') no-repeat center center;
+}
+.icon-print{
+	background:url('images/print.png') no-repeat center center;
+}
+.icon-help{
+	background:url('images/help.png') no-repeat center center;
+}
+.icon-undo{
+	background:url('images/undo.png') no-repeat center center;
+}
+.icon-redo{
+	background:url('images/redo.png') no-repeat center center;
+}
+.icon-back{
+	background:url('images/back.png') no-repeat center center;
+}
+.icon-sum{
+	background:url('images/sum.png') no-repeat center center;
+}
+.icon-tip{
+	background:url('images/tip.png') no-repeat center center;
+}
+.icon-filter{
+	background:url('images/filter.png') no-repeat center center;
+}
+.icon-man{
+	background:url('images/man.png') no-repeat center center;
+}
+.icon-lock{
+	background:url('images/lock.png') no-repeat center center;
+}
+.icon-more{
+	background:url('images/more.png') no-repeat center center;
+}
+
+.icon-mini-add{
+	background:url('images/mini_add.png') no-repeat center center;
+}
+.icon-mini-edit{
+	background:url('images/mini_edit.png') no-repeat center center;
+}
+.icon-mini-refresh{
+	background:url('images/mini_refresh.png') no-repeat center center;
+}
+.icon-region{
+	background:url('images/region.png') no-repeat center center;
+}
+.icon-customer{
+	background:url('images/customer.png') no-repeat center center;
+}
+.icon-device-system{
+	background:url('images/device_system.png') no-repeat center center;
+}
+.icon-equipment{
+	background:url('images/equipment.png') no-repeat center center;
+}
+.icon-organization{
+	background:url('images/organization.png') no-repeat center center;
+}
+.icon-unit{
+	background:url('images/unit.png') no-repeat center center;
+}
+.icon-build{
+	background:url('images/build.png') no-repeat center center;
+}
+.icon-camera{
+	background:url('images/camera.png') no-repeat center center;
+}
+.icon-import{
+	background:url('images/import.png') no-repeat center center;
+}
+.icon-export{
+	background:url('images/export.png') no-repeat center center;
+}
+.icon-videodrv{
+	background:url('images/videodrv.png') no-repeat center center;
+}
+.icon-building{
+	background:url('images/building.png') no-repeat center center;
+}
+.icon-play{
+	background:url('images/play.png') no-repeat center center;
+}
+.icon-pause{
+	background:url('images/pause.png') no-repeat center center;
+}
+
+/* .icon-large-picture{
+	background:url('images/large_picture.png') no-repeat center center;
+}
+.icon-large-clipart{
+	background:url('images/large_clipart.png') no-repeat center center;
+}
+.icon-large-shapes{
+	background:url('images/large_shapes.png') no-repeat center center;
+}
+.icon-large-smartart{
+	background:url('images/large_smartart.png') no-repeat center center;
+} */
+.icon-large-chart{
+	background:url('images/large_chart.png') no-repeat center center;
+}

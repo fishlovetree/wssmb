@@ -1,0 +1,39 @@
+/*²Ëµ¥À¸ÑùÊ½*/
+ .wsTool{
+    position: absolute;
+    top: 30px;
+    right: 20px;
+    background-color: #eee;
+    border: 1px solid #aaa;
+}
+ .wsTool a{
+     float: left;
+     color:#555;
+     text-decoration: none;
+     box-sizing: border-box;
+     font-size: 12px;
+     cursor: pointer;
+     text-align: center;
+     width: 50px;
+ }
+ .wsTool a:hover{
+     background-color: #ffd144;
+ }
+ .wsTool a i{
+     font-size: 25px;
+ }
+ .wsBtn-orbit{
+     margin: 2px 10px;
+ }
+ .wsBtn-move{
+     margin: 2px 10px 2px 2px;
+ }
+ .wsBtn-zoom{
+     margin: 2px 10px 2px 2px;
+ }
+ .wsBtn-fullwindow{
+     margin: 2px 10px 2px 2px;
+ }
+ .wsBtn-export{
+     margin: 2px 10px 2px 2px;
+ }

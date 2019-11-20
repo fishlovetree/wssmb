@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.SysIdentityMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.SysIdentity" >
+    <id column="IDENTITYNAME" property="identityname" jdbcType="VARCHAR" />
+    <result column="IDENTITYDESCRIBING" property="identitydescribing" jdbcType="VARCHAR" />
+    <result column="IDENTITYVALUE" property="identityvalue" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    IDENTITYNAME, IDENTITYDESCRIBING, IDENTITYVALUE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_IDENTITY
+    where IDENTITYNAME = #{identityname,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from SYS_IDENTITY
+    where IDENTITYNAME = #{identityname,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.SysIdentity" >
+    insert into SYS_IDENTITY (IDENTITYNAME, IDENTITYDESCRIBING, 
+      IDENTITYVALUE)
+    values (#{identityname,jdbcType=VARCHAR}, #{identitydescribing,jdbcType=VARCHAR}, 
+      #{identityvalue,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.SysIdentity" >
+    insert into SYS_IDENTITY
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="identityname != null" >
+        IDENTITYNAME,
+      </if>
+      <if test="identitydescribing != null" >
+        IDENTITYDESCRIBING,
+      </if>
+      <if test="identityvalue != null" >
+        IDENTITYVALUE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="identityname != null" >
+        #{identityname,jdbcType=VARCHAR},
+      </if>
+      <if test="identitydescribing != null" >
+        #{identitydescribing,jdbcType=VARCHAR},
+      </if>
+      <if test="identityvalue != null" >
+        #{identityvalue,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.SysIdentity" >
+    update SYS_IDENTITY
+    <set >
+      <if test="identitydescribing != null" >
+        IDENTITYDESCRIBING = #{identitydescribing,jdbcType=VARCHAR},
+      </if>
+      <if test="identityvalue != null" >
+        IDENTITYVALUE = #{identityvalue,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where IDENTITYNAME = #{identityname,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.SysIdentity" >
+    update SYS_IDENTITY
+    set IDENTITYDESCRIBING = #{identitydescribing,jdbcType=VARCHAR},
+      IDENTITYVALUE = #{identityvalue,jdbcType=DECIMAL}
+    where IDENTITYNAME = #{identityname,jdbcType=VARCHAR}
+  </update>
+</mapper>

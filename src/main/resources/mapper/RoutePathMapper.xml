@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.RoutePathMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.RoutePath" >
+    <result column="PATHID" property="pathid" jdbcType="DECIMAL" />
+    <result column="PATHNAME" property="pathname" jdbcType="VARCHAR" />
+    <result column="SOURCENUM" property="sourcenum" jdbcType="DECIMAL" />
+    <result column="TARGETNUM" property="targetnum" jdbcType="DECIMAL" />
+    <result column="PATHCOST" property="pathcost" jdbcType="DECIMAL" />
+    <result column="ISCLOSED" property="isclosed" jdbcType="DECIMAL" />
+    <result column="COORDINATES" property="coordinates" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="BUILDINGID" property="buildingid" jdbcType="DECIMAL" />
+  </resultMap>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.RoutePath" >
+    insert into BUS_ROUTEPATH (PATHID, PATHNAME, SOURCENUM, 
+      TARGETNUM, PATHCOST, ISCLOSED, 
+      COORDINATES, STATUS)
+    values (#{pathid,jdbcType=DECIMAL}, #{pathname,jdbcType=VARCHAR}, #{sourcenum,jdbcType=DECIMAL}, 
+      #{targetnum,jdbcType=DECIMAL}, #{pathcost,jdbcType=DECIMAL}, #{isclosed,jdbcType=DECIMAL}, 
+      #{coordinates,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{buildingid,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.RoutePath" >
+    insert into BUS_ROUTEPATH
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="pathid != null" >
+        PATHID,
+      </if>
+      <if test="pathname != null" >
+        PATHNAME,
+      </if>
+      <if test="sourcenum != null" >
+        SOURCENUM,
+      </if>
+      <if test="targetnum != null" >
+        TARGETNUM,
+      </if>
+      <if test="pathcost != null" >
+        PATHCOST,
+      </if>
+      <if test="isclosed != null" >
+        ISCLOSED,
+      </if>
+      <if test="coordinates != null" >
+        COORDINATES,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="buildingid != null" >
+        BUILDINGID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="pathid != null" >
+        #{pathid,jdbcType=DECIMAL},
+      </if>
+      <if test="pathname != null" >
+        #{pathname,jdbcType=VARCHAR},
+      </if>
+      <if test="sourcenum != null" >
+        #{sourcenum,jdbcType=DECIMAL},
+      </if>
+      <if test="targetnum != null" >
+        #{targetnum,jdbcType=DECIMAL},
+      </if>
+      <if test="pathcost != null" >
+        #{pathcost,jdbcType=DECIMAL},
+      </if>
+      <if test="isclosed != null" >
+        #{isclosed,jdbcType=DECIMAL},
+      </if>
+      <if test="coordinates != null" >
+        #{coordinates,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="buildingid != null" >
+        #{buildingid,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  
+  <select id="getAllRoutePaths" resultMap="BaseResultMap">
+    select pathid, pathname, sourcenum, targetnum, pathcost, isclosed, coordinates, status, buildingid from bus_routepath
+		where buildingid = #{buildingid, jdbcType=DECIMAL} and status = 1
+  </select>
+</mapper>

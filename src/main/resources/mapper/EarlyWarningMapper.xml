@@ -1,0 +1,1163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.EarlyWarningMapper">
+	<resultMap id="EarlyWarningMap"
+		type="com.ssm.wssmb.model.EarlyWarning">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="alarmType" property="alarmtype"
+			jdbcType="INTEGER" />
+		<result column="occurTime" property="occurtime"
+			jdbcType="TIMESTAMP" />
+		<result column="endTime" property="endtime"
+			jdbcType="TIMESTAMP" />
+		<result column="handlePeople" property="handlepeople"
+			jdbcType="VARCHAR" />
+		<result column="processTime" property="processtime"
+			jdbcType="TIMESTAMP" />
+		<result column="processMethod" property="processmethod"
+			jdbcType="VARCHAR" />
+		<result column="processRemarks" property="processremarks"
+			jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="equipmentAddress" property="equipmentaddress"
+			jdbcType="VARCHAR" />
+		<result column="Address" property="address" jdbcType="VARCHAR" />
+		<result column="systemType" property="systemtype"
+			jdbcType="INTEGER" />
+		<result column="cumulativeNumber" property="cumulativenum"
+			jdbcType="INTEGER" />
+		<result column="insertionTime" property="insertiontime"
+			jdbcType="TIMESTAMP" />
+		<result column="endMethod" property="endmethod"
+			jdbcType="INTEGER" />
+		<result column="measureName" property="measureName"
+			jdbcType="VARCHAR" />
+		<result column="measureNumber" property="measureNumber"
+			jdbcType="VARCHAR" />
+		<result column="currentState" property="currentState"
+			jdbcType="VARCHAR" />
+		<result column="terminalAddress" property="terminalAddress"
+			jdbcType="VARCHAR" />
+		<result column="terminalName" property="terminalName"
+			jdbcType="VARCHAR" />
+		<result column="installationLocation"
+			property="installationLocation" jdbcType="VARCHAR" />
+		<result column="DETAILNAME" property="DETAILNAME"
+			jdbcType="VARCHAR" />
+		<result column="TYPE" property="type" jdbcType="INTEGER" />
+		<!-- 报警名称 -->
+		<result column="alarmName" property="alarmName"
+			jdbcType="VARCHAR" />
+		<result column="equipId" property="equipId" jdbcType="INTEGER" />
+		<result column="equipname" property="equipname"
+			jdbcType="VARCHAR" />
+		<result column="annexname" property="annexname"
+			jdbcType="VARCHAR" />
+		<result column="equipType" property="equipType"
+			jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap id="EarlyWarning"
+		type="com.ssm.wssmb.model.EarlyWarn">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="equipName" property="equipName"
+			jdbcType="VARCHAR" />
+		<result column="EQUIPMENTADDRESS" property="equipmentAddress"
+			jdbcType="VARCHAR" />
+		<result column="COLLECTSTORETIME" property="collectStoreTime"
+			jdbcType="TIMESTAMP" />
+		<result column="eventName" property="eventName"
+			jdbcType="VARCHAR" />
+		<result column="MeasureName" property="MeasureName"
+			jdbcType="VARCHAR" />
+		<result column="Address" property="Address" jdbcType="VARCHAR" />
+		<result column="MeasureNumber" property="MeasureNumber"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectByQueryEarly" resultMap="EarlyWarning">
+		select * from (SELECT t.terminalName AS equipName,o.name AS
+		eventName,m.MeasureName,m.Address,m.MeasureNumber,e.* FROM mb_terminal
+		t,bus_event
+		e,sys_oad o,mb_measurefile m
+		WHERE
+		e.equipmentaddress=t.address AND
+		e.equipmenttype=2 AND
+		o.oi=e.eventtype
+		AND m.MeasureId=t.measureId
+		UNION
+		SELECT a.ammeterName AS
+		equipName,o.name AS
+		eventName,m.MeasureName,m.Address,m.MeasureNumber,e.* FROM mb_ammeter
+		a,bus_event
+		e,sys_oad o,mb_measurefile m
+		WHERE
+		e.equipmentaddress=a.ammeterCode AND
+		e.equipmenttype=3 AND
+		o.oi=e.eventtype AND m.MeasureId=a.boxCode)g
+		where
+		1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.COLLECTSTORETIME,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.EQUIPMENTADDRESS like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByQueryEarlyCount"
+		resultType="java.lang.Integer">
+		select COUNT(0) from (SELECT t.terminalName AS equipName,o.name AS
+		eventName,m.MeasureName,m.Address,e.* FROM mb_terminal t,bus_event
+		e,sys_oad o,mb_measurefile m
+		WHERE e.equipmentaddress=t.address AND
+		e.equipmenttype=2 AND
+		o.oi=e.eventtype AND m.MeasureId=t.measureId
+		UNION
+		SELECT a.ammeterName AS equipName,o.name AS
+		eventName,m.MeasureName,m.Address,e.* FROM mb_ammeter a,bus_event
+		e,sys_oad o,mb_measurefile m
+		WHERE e.equipmentaddress=a.ammeterCode AND
+		e.equipmenttype=3 AND
+		o.oi=e.eventtype AND m.MeasureId=a.boxCode)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.COLLECTSTORETIME,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.EQUIPMENTADDRESS like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+
+	<select id="selectTerminalEarly" resultMap="EarlyWarningMap">
+		SELECT
+		e.*,t.terminalName ,t.address
+		,sc.DETAILNAME
+		,t.installationLocation ,m.MeasureName
+		,m.Address
+		FROM (bus_earlywarning
+		e,mb_terminal t,mb_measurefile m)
+		LEFT JOIN
+		view_constantdetail sc ON
+		sc.DETAILVALUE=e.alarmType
+		WHERE e.id IS NOT
+		NULL AND
+		e.measureAddress=m.MeasureNumber AND
+		t.measureId=m.MeasureId
+		and
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.terminalId=#{id,jdbcType=INTEGER}
+		AND
+		e.equipmentAddress=t.address
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(e.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="alarmtype != null and alarmtype != ''">
+			and cast(e.alarmtype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and t.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and e.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and e.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (e.endtime='' or e.endtime is null)
+			</when>
+			<when test="end == 1">
+				and e.endtime is not null
+			</when>
+		</choose>
+		order by e.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByTerminalEarlyCount"
+		resultType="java.lang.Integer">
+		SELECT COUNT(0)
+		FROM (bus_earlywarning e,mb_terminal t,mb_measurefile
+		m)
+		LEFT JOIN view_constantdetail sc
+		ON sc.DETAILVALUE=e.alarmType
+		WHERE
+		e.id IS NOT NULL AND e.measureAddress=m.MeasureNumber AND
+		t.measureId=m.MeasureId
+		and
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.terminalId=#{id,jdbcType=INTEGER}
+		AND
+		e.equipmentAddress=t.address
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(e.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="alarmtype != null and alarmtype != ''">
+			and cast(e.alarmtype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and t.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and e.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and e.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (e.endtime='' or e.endtime is null)
+			</when>
+			<when test="end == 1">
+				and e.endtime is not null
+			</when>
+		</choose>
+	</select>
+
+	<select id="selectAmmeterEarly" resultMap="EarlyWarningMap">
+		SELECT
+		e.*,t.ammeterName as terminalName ,t.ammeterCode as
+		installationLocation
+		,sc.DETAILNAME
+		,t.installAddress ,m.MeasureName
+		,m.Address
+		FROM (bus_earlywarning
+		e,mb_ammeter t,mb_measurefile m)
+		LEFT
+		JOIN
+		view_constantdetail sc ON
+		sc.DETAILVALUE=e.alarmType
+		WHERE e.id IS
+		NOT
+		NULL AND
+		e.measureAddress=m.MeasureNumber AND
+		t.boxCode=m.MeasureId
+		and
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.id=#{id,jdbcType=INTEGER}
+		AND
+		e.equipmentAddress=t.ammeterCode
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(e.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="alarmtype != null and alarmtype != ''">
+			and cast(e.alarmtype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and t.ammeterName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and e.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and e.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (e.endtime='' or e.endtime is null)
+			</when>
+			<when test="end == 1">
+				and e.endtime is not null
+			</when>
+		</choose>
+		order by e.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByAmmeterEarlyCount"
+		resultType="java.lang.Integer">
+		SELECT COUNT(0)
+		FROM (bus_earlywarning e,mb_ammeter t,mb_measurefile
+		m)
+		LEFT JOIN view_constantdetail sc
+		ON sc.DETAILVALUE=e.alarmType
+		WHERE
+		e.id IS NOT NULL AND e.measureAddress=m.MeasureNumber AND
+		t.boxCode=m.MeasureId
+		and
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.id=#{id,jdbcType=INTEGER}
+		AND
+		e.equipmentAddress=t.installAddress
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(e.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="alarmtype != null and alarmtype != ''">
+			and cast(e.alarmtype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and t.ammeterName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and e.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and e.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (e.endtime='' or e.endtime is null)
+			</when>
+			<when test="end == 1">
+				and e.endtime is not null
+			</when>
+		</choose>
+	</select>
+
+	<select id="selectEquipmentEarly" resultMap="EarlyWarning">
+		SELECT * FROM(SELECT t.terminalName AS equipName,o.name AS
+		eventName,m.MeasureName,m.Address,m.MeasureNumber,e.* FROM mb_terminal
+		t,bus_event
+		e,sys_oad o,mb_measurefile m
+		WHERE
+		e.equipmentaddress=t.address AND e.equipmenttype=2 AND
+		o.oi=e.eventtype AND m.MeasureId=t.measureId AND
+		t.measureId=#{id,jdbcType=INTEGER}
+		UNION
+		SELECT a.ammeterName AS
+		equipName,o.name AS
+		eventName,m.MeasureName,m.Address,m.MeasureNumber,e.* FROM mb_ammeter
+		a,bus_event
+		e,sys_oad o,mb_measurefile m
+		WHERE
+		e.equipmentaddress=a.ammeterCode AND e.equipmenttype=3 AND
+		o.oi=e.eventtype AND m.MeasureId=a.boxCode
+		AND
+		a.boxCode=#{id,jdbcType=INTEGER})g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.COLLECTSTORETIME,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.EQUIPMENTADDRESS like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByEquipmentEarlyCount"
+		resultType="java.lang.Integer">
+		SELECT count(0) FROM(SELECT t.terminalName AS equipName,o.name AS
+		eventName,e.* FROM mb_terminal t,bus_event e,sys_oad o
+		WHERE
+		e.equipmentaddress=t.address AND e.equipmenttype=2 AND
+		o.oi=e.eventtype AND t.measureId=#{id,jdbcType=INTEGER}
+		UNION
+		SELECT
+		a.ammeterName AS equipName,o.name AS eventName,e.* FROM mb_ammeter
+		a,bus_event e,sys_oad o
+		WHERE e.equipmentaddress=a.ammeterCode AND
+		e.equipmenttype=3 AND
+		o.oi=e.eventtype AND
+		a.boxCode=#{id,jdbcType=INTEGER})g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.COLLECTSTORETIME,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.EQUIPMENTADDRESS like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+
+	<select id="selectRegionEarly" resultMap="EarlyWarning">
+		select * from (SELECT t.terminalName AS equipName,o.name AS
+		eventName,m.MeasureName,m.Address,m.MeasureNumber,e.* FROM mb_terminal t,bus_event
+		e,sys_oad o,mb_measurefile m
+		WHERE e.equipmentaddress=t.address AND e.equipmenttype=2 AND
+		o.oi=e.eventtype AND m.MeasureId=t.measureId AND
+		IS_PARENT_REGION(m.Region,#{id,jdbcType=INTEGER})=1
+		UNION
+		SELECT a.ammeterName AS equipName,o.name AS
+		eventName,m.MeasureName,m.Address,m.MeasureNumber,e.* FROM mb_ammeter a,bus_event
+		e,sys_oad o,mb_measurefile m
+		WHERE e.equipmentaddress=a.ammeterCode AND e.equipmenttype=3 AND
+		o.oi=e.eventtype AND m.MeasureId=a.boxCode AND
+		IS_PARENT_REGION(m.Region,#{id,jdbcType=INTEGER})=1 )g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.COLLECTSTORETIME,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.EQUIPMENTADDRESS like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByRegionEarlyCount"
+		resultType="java.lang.Integer">
+		select count(0) from (SELECT t.terminalName AS equipName,o.name AS
+		eventName,m.MeasureName,m.Address,e.* FROM mb_terminal t,bus_event
+		e,sys_oad o,mb_measurefile m
+		WHERE e.equipmentaddress=t.address AND e.equipmenttype=2 AND
+		o.oi=e.eventtype AND m.MeasureId=t.measureId AND
+		IS_PARENT_REGION(m.Region,#{id,jdbcType=INTEGER})=1
+		UNION
+		SELECT a.ammeterName AS equipName,o.name AS
+		eventName,m.MeasureName,m.Address,e.* FROM mb_ammeter a,bus_event
+		e,sys_oad o,mb_measurefile m
+		WHERE e.equipmentaddress=a.ammeterCode AND e.equipmenttype=3 AND
+		o.oi=e.eventtype AND m.MeasureId=a.boxCode AND
+		IS_PARENT_REGION(m.Region,#{id,jdbcType=INTEGER})=1 )g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.COLLECTSTORETIME,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.EQUIPMENTADDRESS like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+
+	<update id="updateEndTime" parameterType="java.lang.Integer">
+		update bus_earlywarning
+		set endTime = sysdate(),
+		endMethod = 2
+		where ID = #{id,jdbcType=DECIMAL}
+	</update>
+
+	<select id="selectByPrimaryKey" resultMap="EarlyWarningMap"
+		parameterType="java.lang.Integer">
+		select
+		*
+		from bus_earlywarning
+		where ID =
+		#{id,jdbcType=DECIMAL}
+	</select>
+
+	<update id="updateByPrimaryKeySelective"
+		parameterType="com.ssm.wssmb.model.EarlyWarning">
+		update bus_earlywarning
+		<set>
+			<if test="alarmtype != null">
+				alarmType = #{alarmtype,jdbcType=INTEGER},
+			</if>
+			<if test="occurtime != null">
+				occurTime = #{occurtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endtime != null">
+				endTime = #{endtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="handlepeople != null">
+				handlePeople = #{handlepeople,jdbcType=VARCHAR},
+			</if>
+			<if test="processtime != null">
+				processTime = sysdate(),
+			</if>
+			<if test="processmethod != null">
+				processMethod = #{processmethod,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="equipmentaddress != null">
+				equipmentAddress = #{equipmentaddress,jdbcType=VARCHAR},
+			</if>
+			<if test="measureAddress != null">
+				measureAddress = #{measureaddress,jdbcType=VARCHAR},
+			</if>
+			<if test="systemtype != null">
+				systemType = #{systemtype,jdbcType=INTEGER},
+			</if>
+			<if test="processremarks != null">
+				processRemarks = #{processremarks,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=DECIMAL}
+	</update>
+
+	<!-- 根据预警id和事件发生类型查询数据详情 -->
+	<select id="selectEarlyMXByEarlyIdAndType"
+		resultType="com.ssm.wssmb.model.EarlyWarnMX">
+		select mx.ITEMNUMBER, mx.EVENTDATA, mx.MXID, e.alarmtype
+		from BUS_EARLYWARNINGMX mx
+		left join BUS_EARLYWARNING e on e.id = mx.id
+		left join mb_measurefile u on u.Address = e.measureAddress
+		where mx.ID
+		= #{id,jdbcType=INTEGER} and mx.EVENTDATATYPE =
+		#{eventdatatype,jdbcType=INTEGER}
+		order by mx.itemnumber
+	</select>
+
+	<select id="getWarnByMeasureAddress" resultMap="EarlyWarningMap">
+		SELECT * FROM
+		bus_earlywarning WHERE measureAddress
+		=#{measureAddress,jdbcType=INTEGER}
+	</select>
+
+	<!-- 统计告警率 -->
+	<select id="statisticsAlarmRate" resultMap="EarlyWarningMap">
+		SELECT
+		u.username as
+		handlepeople,m.MeasureName,w.id,w.alarmType,w.occurTime,w.endTime,w.handlePeople,w.processTime,w.processMethod,w.status,w.equipmentAddress,w.measureAddress,w.systemType,w.insertionTime,w.cumulativeNumber,w.endMethod,w.currentState,w.processRemarks,w.equipId,w.type
+		as equipType,
+		sc.DETAILNAME
+		alarmName,sc.type as type,ba.ANNEXNAME AS
+		annexname
+		FROM
+		(bus_earlywarning w,(SELECT id
+		FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT
+		JOIN (
+		SELECT cd.*,c.detailvalue as
+		type FROM sys_constantdetail cd
+		LEFT
+		JOIN sys_constantdetail c ON
+		c.detailid=cd.parentid
+		WHERE cd.coding=1011
+		AND cd.status=1
+		) sc ON
+		w.ALARMTYPE=sc.DETAILVALUE
+		LEFT JOIN
+		BUS_EARLYWARNINGANNEX ba ON
+		w.ID=ba.ID
+		left join sys_user u on
+		u.id=w.HANDLEPEOPLE
+		left join
+		mb_measurefile m on
+		m.MeasureNumber=w.measureAddress
+		where w.id is not
+		null
+		AND
+		m.Region=gg.id
+		and
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		<if test="year != null and year != ''">
+			and cast(date_format(w.insertionTime,'%Y') as
+			SIGNED)=#{year,jdbcType=VARCHAR}
+		</if>
+		<if test="month != null and month != ''">
+			and cast(date_format(w.insertionTime,'%m')as
+			SIGNED)=#{month,jdbcType=VARCHAR}
+		</if>
+		<if test="day != null and day != ''">
+			and cast(date_format(w.insertionTime,'%d')as
+			SIGNED)=#{day,jdbcType=VARCHAR}
+		</if>
+		<if test="hour != null and hour != ''">
+			and cast(date_format(w.insertionTime,'%H')as
+			SIGNED)=#{hour,jdbcType=VARCHAR}
+		</if>
+		<if test="alarmtype != null and alarmtype != ''">
+			and cast(w.alarmType as SIGNED) =
+			#{alarmtype,jdbcType=VARCHAR}
+		</if>
+		ORDER BY w.insertionTime DESC,w.occurTime DESC
+	</select>
+
+	<select id="terminalStatic" resultMap="EarlyWarningMap">
+		SELECT
+		m.MeasureName as measureName,t.terminalName as
+		equipname,t.installationLocation as
+		installationLocation,w.id,w.alarmType,w.occurTime,w.endTime,w.handlePeople,w.processTime,w.processMethod,w.status,
+		w.equipmentAddress,w.measureAddress,w.systemType,w.insertionTime,w.cumulativeNumber,w.endMethod,
+		w.currentState,w.processRemarks,w.equipId,
+		sc.DETAILNAME
+		alarmName,sc.type as type,ba.ANNEXNAME AS
+		annexname,
+		sc.type
+		FROM
+		bus_earlywarning w
+		LEFT JOIN (
+		SELECT
+		cd.*,c.detailvalue
+		type FROM
+		sys_constantdetail cd
+		LEFT JOIN
+		sys_constantdetail c ON
+		c.detailid=cd.parentid
+		WHERE cd.coding=1011 AND
+		cd.status=1
+		) sc ON
+		w.ALARMTYPE=sc.DETAILVALUE
+		LEFT JOIN
+		BUS_EARLYWARNINGANNEX ba ON
+		w.ID=ba.ID
+		left join mb_terminal t on
+		w.equipmentAddress=t.address
+		left
+		join mb_measurefile m on t.measureId=m.MeasureId
+		where w.id is not null
+		and
+		w.equipmentAddress=t.address
+		and t.terminalId=#{id,jdbcType=INTEGER}
+		and
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		<if test="year != null and year != ''">
+			and cast(date_format(w.insertionTime,'%Y') as
+			SIGNED)=#{year,jdbcType=VARCHAR}
+		</if>
+		<if test="month != null and month != ''">
+			and cast(date_format(w.insertionTime,'%m')as
+			SIGNED)=#{month,jdbcType=VARCHAR}
+		</if>
+		<if test="day != null and day != ''">
+			and cast(date_format(w.insertionTime,'%d')as
+			SIGNED)=#{day,jdbcType=VARCHAR}
+		</if>
+		<if test="hour != null and hour != ''">
+			and cast(date_format(w.insertionTime,'%H')as
+			SIGNED)=#{hour,jdbcType=VARCHAR}
+		</if>
+		<if test="alarmtype != null and alarmtype != ''">
+			and cast(w.alarmType as SIGNED) =
+			#{alarmtype,jdbcType=VARCHAR}
+		</if>
+		ORDER BY w.insertionTime DESC,w.occurTime DESC
+	</select>
+
+	<select id="ammeterStatic" resultMap="EarlyWarningMap">
+		SELECT
+		m.MeasureName as measureName,a.ammeterName as
+		equipname,a.installAddress as
+		installationLocation,w.id,w.alarmType,w.occurTime,w.endTime,w.handlePeople,w.processTime,w.processMethod,w.status,
+		w.equipmentAddress,w.measureAddress,w.systemType,w.insertionTime,w.cumulativeNumber,w.endMethod,
+		w.currentState,w.processRemarks,w.equipId,
+		sc.DETAILNAME
+		alarmName,sc.type,ba.ANNEXNAME AS
+		annexname
+		FROM
+		bus_earlywarning w
+		LEFT
+		JOIN (
+		SELECT
+		cd.*,c.detailvalue
+		type FROM sys_constantdetail cd
+		LEFT JOIN
+		sys_constantdetail c ON
+		c.detailid=cd.parentid
+		WHERE cd.coding=1011 AND
+		cd.status=1
+		) sc ON
+		w.ALARMTYPE=sc.DETAILVALUE
+		LEFT JOIN
+		BUS_EARLYWARNINGANNEX ba ON
+		w.ID=ba.ID
+		LEFT JOIN mb_ammeter a ON
+		w.equipmentAddress=a.ammeterCode
+		left join
+		mb_measurefile m
+		on
+		m.MeasureId=a.boxCode
+		WHERE w.id IS NOT NULL
+		AND
+		a.concentratorCode=#{id,jdbcType=INTEGER}
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and w.type=3
+		<if test="year != null and year != ''">
+			and cast(date_format(w.insertionTime,'%Y') as
+			SIGNED)=#{year,jdbcType=VARCHAR}
+		</if>
+		<if test="month != null and month != ''">
+			and cast(date_format(w.insertionTime,'%m')as
+			SIGNED)=#{month,jdbcType=VARCHAR}
+		</if>
+		<if test="day != null and day != ''">
+			and cast(date_format(w.insertionTime,'%d')as
+			SIGNED)=#{day,jdbcType=VARCHAR}
+		</if>
+		<if test="hour != null and hour != ''">
+			and cast(date_format(w.insertionTime,'%H')as
+			SIGNED)=#{hour,jdbcType=VARCHAR}
+		</if>
+		<if test="alarmtype != null and alarmtype != ''">
+			and cast(w.alarmType as SIGNED) =
+			#{alarmtype,jdbcType=VARCHAR}
+		</if>
+		ORDER BY w.insertionTime DESC,w.occurTime DESC
+	</select>
+
+	<select id="concentratorStatic" resultMap="EarlyWarningMap">
+		select * from (SELECT m.MeasureName as measureName,
+		t.terminalName as
+		equipname,t.installationLocation as
+		installationLocation,w.id,w.alarmType,w.occurTime,w.endTime,w.handlePeople,w.processTime,w.processMethod,w.status,
+		w.equipmentAddress,w.measureAddress,w.systemType,w.insertionTime,w.cumulativeNumber,w.endMethod,
+		w.currentState,w.processRemarks,w.equipId,
+		sc.DETAILNAME
+		alarmName,sc.type as type,ba.ANNEXNAME AS
+		annexname
+		FROM
+		bus_earlywarning w
+		LEFT
+		JOIN (
+		SELECT
+		cd.*,c.detailvalue
+		type FROM
+		sys_constantdetail cd
+		LEFT
+		JOIN
+		sys_constantdetail c ON
+		c.detailid=cd.parentid
+		WHERE cd.coding=1011
+		AND
+		cd.status=1
+		) sc ON
+		w.ALARMTYPE=sc.DETAILVALUE
+		LEFT JOIN
+		BUS_EARLYWARNINGANNEX ba ON
+		w.ID=ba.ID
+		LEFT JOIN mb_terminal t ON
+		w.equipmentAddress=t.address
+		left
+		join
+		mb_measurefile m
+		on
+		m.MeasureId=t.measureId
+		WHERE w.id IS NOT NULL
+		AND
+		t.concentratorId=#{id,jdbcType=INTEGER}
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		and w.type=2
+		UNION
+		SELECT
+		m.MeasureName as measureName,a.ammeterName as
+		equipname,a.installAddress as
+		installationLocation,w.id,w.alarmType,w.occurTime,w.endTime,w.handlePeople,w.processTime,w.processMethod,w.status,
+		w.equipmentAddress,w.measureAddress,w.systemType,w.insertionTime,w.cumulativeNumber,w.endMethod,
+		w.currentState,w.processRemarks,w.equipId,
+		sc.DETAILNAME
+		alarmName,sc.type,ba.ANNEXNAME AS
+		annexname
+		FROM
+		bus_earlywarning w
+		LEFT
+		JOIN (
+		SELECT
+		cd.*,c.detailvalue
+		type FROM sys_constantdetail cd
+		LEFT JOIN
+		sys_constantdetail c ON
+		c.detailid=cd.parentid
+		WHERE cd.coding=1011 AND
+		cd.status=1
+		) sc ON
+		w.ALARMTYPE=sc.DETAILVALUE
+		LEFT JOIN
+		BUS_EARLYWARNINGANNEX ba ON
+		w.ID=ba.ID
+		LEFT JOIN mb_ammeter a ON
+		w.equipmentAddress=a.ammeterCode
+		left join
+		mb_measurefile m
+		on
+		m.MeasureId=a.boxCode
+		WHERE w.id IS NOT NULL
+		AND
+		a.concentratorCode=#{id,jdbcType=INTEGER}
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and w.type=3
+		)g
+		where 1=1
+		<if test="year != null and year != ''">
+			and cast(date_format(g.insertionTime,'%Y') as
+			SIGNED)=#{year,jdbcType=VARCHAR}
+		</if>
+		<if test="month != null and month != ''">
+			and cast(date_format(g.insertionTime,'%m')as
+			SIGNED)=#{month,jdbcType=VARCHAR}
+		</if>
+		<if test="day != null and day != ''">
+			and cast(date_format(g.insertionTime,'%d')as
+			SIGNED)=#{day,jdbcType=VARCHAR}
+		</if>
+		<if test="hour != null and hour != ''">
+			and cast(date_format(g.insertionTime,'%H')as
+			SIGNED)=#{hour,jdbcType=VARCHAR}
+		</if>
+		<if test="alarmtype != null and alarmtype != ''">
+			and cast(g.alarmType as SIGNED) =
+			#{alarmtype,jdbcType=VARCHAR}
+		</if>
+		ORDER BY g.insertionTime DESC,g.occurTime DESC
+	</select>
+
+	<select id="measureStatic" resultMap="EarlyWarningMap">
+		select * from (SELECT
+		m.MeasureName as measureName,
+		t.terminalName as
+		equipname,t.installationLocation as
+		installationLocation,w.id,w.alarmType,w.occurTime,w.endTime,w.handlePeople,w.processTime,w.processMethod,w.status,
+		w.equipmentAddress,w.measureAddress,w.systemType,w.insertionTime,w.cumulativeNumber,w.endMethod,
+		w.currentState,w.processRemarks,w.equipId,
+		sc.DETAILNAME
+		alarmName,sc.type as type,ba.ANNEXNAME AS
+		annexname
+		FROM
+		bus_earlywarning w
+		LEFT
+		JOIN (
+		SELECT
+		cd.*,c.detailvalue
+		type FROM
+		sys_constantdetail cd
+		LEFT
+		JOIN
+		sys_constantdetail c ON
+		c.detailid=cd.parentid
+		WHERE cd.coding=1011
+		AND
+		cd.status=1
+		) sc ON
+		w.ALARMTYPE=sc.DETAILVALUE
+		LEFT JOIN
+		BUS_EARLYWARNINGANNEX ba ON
+		w.ID=ba.ID
+		LEFT JOIN mb_terminal t ON
+		w.equipmentAddress=t.address
+		left
+		join mb_measurefile m
+		on
+		m.MeasureId=t.measureId
+		WHERE w.id IS NOT NULL
+		AND
+		t.measureId=#{id,jdbcType=INTEGER}
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		and w.type=2
+		UNION
+		SELECT
+		m.MeasureName as measureName,
+		a.ammeterName as
+		equipname,a.installAddress as
+		installationLocation,w.id,w.alarmType,w.occurTime,w.endTime,w.handlePeople,w.processTime,w.processMethod,w.status,
+		w.equipmentAddress,w.measureAddress,w.systemType,w.insertionTime,w.cumulativeNumber,w.endMethod,
+		w.currentState,w.processRemarks,w.equipId,
+		sc.DETAILNAME
+		alarmName,sc.type as type,ba.ANNEXNAME AS
+		annexname
+		FROM
+		bus_earlywarning w
+		LEFT JOIN (
+		SELECT
+		cd.*,c.detailvalue
+		type FROM
+		sys_constantdetail cd
+		LEFT JOIN
+		sys_constantdetail c ON
+		c.detailid=cd.parentid
+		WHERE cd.coding=1011 AND
+		cd.status=1
+		) sc ON
+		w.ALARMTYPE=sc.DETAILVALUE
+		LEFT JOIN
+		BUS_EARLYWARNINGANNEX ba ON
+		w.ID=ba.ID
+		LEFT JOIN mb_ammeter a ON
+		w.equipmentAddress=a.ammeterCode
+		left join mb_measurefile m on
+		m.MeasureId=a.boxCode
+		WHERE w.id IS NOT
+		NULL
+		AND
+		a.boxCode=#{id,jdbcType=INTEGER}
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and w.type=3
+		)g
+		where 1=1
+		<if test="year != null and year != ''">
+			and cast(date_format(g.insertionTime,'%Y') as
+			SIGNED)=#{year,jdbcType=VARCHAR}
+		</if>
+		<if test="month != null and month != ''">
+			and cast(date_format(g.insertionTime,'%m')as
+			SIGNED)=#{month,jdbcType=VARCHAR}
+		</if>
+		<if test="day != null and day != ''">
+			and cast(date_format(g.insertionTime,'%d')as
+			SIGNED)=#{day,jdbcType=VARCHAR}
+		</if>
+		<if test="hour != null and hour != ''">
+			and cast(date_format(g.insertionTime,'%H')as
+			SIGNED)=#{hour,jdbcType=VARCHAR}
+		</if>
+		<if test="alarmtype != null and alarmtype != ''">
+			and cast(g.alarmType as SIGNED) =
+			#{alarmtype,jdbcType=VARCHAR}
+		</if>
+		ORDER BY g.insertionTime DESC,g.occurTime DESC
+	</select>
+
+	<select id="regionStatic" resultMap="EarlyWarningMap">
+		select * from (SELECT
+		m.MeasureName AS measureName,
+		t.terminalName AS
+		equipname,t.installationLocation AS
+		installationLocation,w.id,w.alarmType,w.occurTime,w.endTime,w.handlePeople,w.processTime,w.processMethod,w.status,
+		w.equipmentAddress,w.measureAddress,w.systemType,w.insertionTime,w.cumulativeNumber,w.endMethod,
+		w.currentState,w.processRemarks,w.equipId,
+		sc.DETAILNAME
+		alarmName,sc.type as type,ba.ANNEXNAME AS
+		annexname
+		FROM
+		(bus_earlywarning
+		w,(SELECT id
+		FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT
+		JOIN (
+		SELECT
+		cd.*,c.detailvalue
+		type FROM sys_constantdetail cd
+		LEFT JOIN
+		sys_constantdetail c ON
+		c.detailid=cd.parentid
+		WHERE cd.coding=1011 AND
+		cd.status=1
+		) sc ON
+		w.ALARMTYPE=sc.DETAILVALUE
+		LEFT JOIN
+		BUS_EARLYWARNINGANNEX ba ON
+		w.ID=ba.ID
+		LEFT JOIN mb_terminal t ON
+		w.equipmentAddress=t.address
+		LEFT
+		JOIN mb_measurefile m ON
+		m.MeasureId=t.measureId
+		WHERE w.id IS NOT NULL
+		AND t.region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND w.type=2
+		UNION
+		SELECT
+		m.MeasureName AS measureName,
+		a.ammeterName AS
+		equipname,a.installAddress AS
+		installationLocation,w.id,w.alarmType,w.occurTime,w.endTime,w.handlePeople,w.processTime,w.processMethod,w.status,
+		w.equipmentAddress,w.measureAddress,w.systemType,w.insertionTime,w.cumulativeNumber,w.endMethod,
+		w.currentState,w.processRemarks,w.equipId,
+		sc.DETAILNAME
+		alarmName,sc.type as type,ba.ANNEXNAME AS
+		annexname
+		FROM
+		(bus_earlywarning w,(SELECT id
+		FROM
+		view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT
+		JOIN (
+		SELECT
+		cd.*,c.detailvalue
+		type FROM sys_constantdetail cd
+		LEFT JOIN
+		sys_constantdetail c ON
+		c.detailid=cd.parentid
+		WHERE cd.coding=1011 AND
+		cd.status=1
+		) sc ON
+		w.ALARMTYPE=sc.DETAILVALUE
+		LEFT JOIN
+		BUS_EARLYWARNINGANNEX ba ON
+		w.ID=ba.ID
+		LEFT JOIN mb_ammeter a ON
+		w.equipmentAddress=a.ammeterCode
+		LEFT JOIN mb_measurefile m ON
+		m.MeasureId=a.boxCode
+		WHERE w.id IS NOT
+		NULL
+		AND
+		a.concentratorCode
+		IN(SELECT c.concentratorId
+		FROM
+		mb_concentrator
+		c,(SELECT id FROM
+		view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		c.region=gg.id)
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		AND w.type=3
+
+		)g
+		where 1=1
+		<if test="year != null and year != ''">
+			and cast(date_format(g.insertionTime,'%Y') as
+			SIGNED)=#{year,jdbcType=VARCHAR}
+		</if>
+		<if test="month != null and month != ''">
+			and cast(date_format(g.insertionTime,'%m')as
+			SIGNED)=#{month,jdbcType=VARCHAR}
+		</if>
+		<if test="day != null and day != ''">
+			and cast(date_format(g.insertionTime,'%d')as
+			SIGNED)=#{day,jdbcType=VARCHAR}
+		</if>
+		<if test="hour != null and hour != ''">
+			and cast(date_format(g.insertionTime,'%H')as
+			SIGNED)=#{hour,jdbcType=VARCHAR}
+		</if>
+		<if test="alarmtype != null and alarmtype != ''">
+			and cast(g.alarmType as SIGNED) =
+			#{alarmtype,jdbcType=VARCHAR}
+		</if>
+		ORDER BY g.insertionTime DESC,g.occurTime DESC
+	</select>
+
+	<select id="getTerminalName" resultType="String">
+		select terminalName from
+		mb_terminal
+		where terminalId=#{equipId,jdbcType=INTEGER}
+	</select>
+
+	<select id="getAmmterName" resultType="String">
+		select ammeterName from
+		mb_ammeter
+		where id=#{equipId,jdbcType=INTEGER}
+	</select>
+
+	<select id="getTerminalInstall" resultType="String">
+		select
+		installationLocation from
+		mb_terminal
+		where
+		terminalId=#{equipId,jdbcType=INTEGER}
+	</select>
+
+	<select id="getAmmeterInstall" resultType="String">
+		select installAddress
+		from
+		mb_ammeter
+		where id=#{equipId,jdbcType=INTEGER}
+	</select>
+
+	<!--查询预警同期对比 -->
+	<select id="getEarlyComparison"
+		resultType="com.ssm.wssmb.model.EarlyWarningData">
+		SELECT ec.DETAILNAME AS NAME,ec.dateStr AS DATESTR,COUNT(DETAILNAME)
+		AS VALUE
+		FROM (
+		SELECT v.*,DATE_FORMAT(v.insertiontime,'${dateType}') AS
+		dateStr,CASE WHEN v.SYSTEMTYPE='0' THEN '其他' ELSE c.DETAILNAME END
+		DETAILNAME
+		FROM view_earlywarnequipment v
+		LEFT JOIN (SELECT
+		CODING,DETAILNAME,DETAILVALUE FROM SYS_CONSTANTDETAIL
+		WHERE
+		CODING=1003) c ON v.SYSTEMTYPE=c.DETAILVALUE
+		WHERE 1=1
+		AND
+		v.region IN
+		(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER})
+		<if test="organizationId != null and organizationId !=''">
+			and
+			IS_PARENT_ORGANIZATION(v.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		</if>
+		<if test="dateType != null and dateType != ''">
+			and date_format(v.insertiontime,'${dateType}') in
+			<foreach collection="equalTime" item="item" index="index"
+				open="(" close=")" separator=",">
+				#{item,jdbcType=VARCHAR}
+			</foreach>
+		</if>
+		) ec
+		group by ec.DETAILNAME,ec.dateStr
+	</select>
+</mapper>

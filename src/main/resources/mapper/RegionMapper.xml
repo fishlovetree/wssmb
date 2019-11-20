@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.RegionMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.Region" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="PARENTID" property="parentid" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="SHORTNAME" property="shortname" jdbcType="VARCHAR" />
+    <result column="LEVELTYPE" property="leveltype" jdbcType="DECIMAL" />
+    <result column="CITYCODE" property="citycode" jdbcType="VARCHAR" />
+    <result column="ZIPCODE" property="zipcode" jdbcType="VARCHAR" />
+    <result column="MERGERNAME" property="mergername" jdbcType="VARCHAR" />
+    <result column="LNG" property="lng" jdbcType="VARCHAR" />
+    <result column="LAT" property="lat" jdbcType="VARCHAR" />
+    <result column="PINYIN" property="pinyin" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, NAME, PARENTID, STATUS, SHORTNAME, LEVELTYPE, CITYCODE, ZIPCODE, MERGERNAME, LNG, LAT, PINYIN
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_AREA
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    update SYS_AREA set STATUS = 0
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.Region" >
+    insert into SYS_AREA (D, NAME, PARENTID, STATUS, SHORTNAME, LEVELTYPE, CITYCODE, 
+    ZIPCODE, MERGERNAME, LNG, LAT, PINYIN
+      )
+    values (#{id,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR}, #{parentid,jdbcType=DECIMAL}, 
+      #{status,jdbcType=DECIMAL}, #{shortname,jdbcType=VARCHAR}, #{leveltype,jdbcType=DECIMAL}, 
+      #{citycode,jdbcType=VARCHAR}, #{zipcode,jdbcType=VARCHAR}, #{mergername,jdbcType=VARCHAR}, 
+      #{lng,jdbcType=VARCHAR}, #{lat,jdbcType=VARCHAR}, #{pinyin,jdbcType=VARCHAR}, 
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.Region" >
+    insert into SYS_AREA
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="parentid != null" >
+        PARENTID,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="shortname != null" >
+        SHORTNAME,
+      </if>
+      <if test="leveltype != null" >
+        LEVELTYPE,
+      </if>
+      <if test="citycode != null" >
+        CITYCODE,
+      </if>
+      <if test="zipcode != null" >
+        ZIPCODE,
+      </if>
+      <if test="mergername != null" >
+        MERGERNAME,
+      </if>
+      <if test="lng != null" >
+        LNG,
+      </if>
+      <if test="lat != null" >
+        LAT,
+      </if>
+      <if test="pinyin != null" >
+        PINYIN,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="parentid != null" >
+        #{parentid,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="shortname != null" >
+        #{shortname,jdbcType=VARCHAR},
+      </if>
+      <if test="leveltype != null" >
+        #{leveltype,jdbcType=DECIMAL},
+      </if>
+      <if test="citycode != null" >
+        #{citycode,jdbcType=VARCHAR},
+      </if>
+      <if test="zipcode != null" >
+        #{zipcode,jdbcType=VARCHAR},
+      </if>
+      <if test="mergername != null" >
+        #{mergername,jdbcType=VARCHAR},
+      </if>
+      <if test="lng != null" >
+        #{lng,jdbcType=VARCHAR},
+      </if>
+      <if test="lat != null" >
+        #{lat,jdbcType=VARCHAR},
+      </if>
+      <if test="pinyin != null" >
+        #{pinyin,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.Region" >
+    update SYS_AREA
+    <set >
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="parentid != null" >
+        PARENTID = #{parentid,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="shortname != null" >
+        SHORTNAME = #{shortname,jdbcType=VARCHAR},
+      </if>
+      <if test="leveltype != null" >
+        LEVELTYPE = #{leveltype,jdbcType=DECIMAL},
+      </if>
+      <if test="citycode != null" >
+        CITYCODE = #{citycode,jdbcType=VARCHAR},
+      </if>
+      <if test="zipcode != null" >
+        ZIPCODE = #{zipcode,jdbcType=VARCHAR},
+      </if>
+      <if test="mergername != null" >
+        MERGERNAME = #{mergername,jdbcType=VARCHAR},
+      </if>
+      <if test="lng != null" >
+        LNG = #{lng,jdbcType=VARCHAR},
+      </if>
+      <if test="lat != null" >
+        LAT = #{lat,jdbcType=VARCHAR},
+      </if>
+      <if test="pinyin != null" >
+        PINYIN = #{pinyin,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.Region" >
+    update SYS_AREA
+    set NAME = #{name,jdbcType=VARCHAR},
+      PARENTID = #{parentid,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=DECIMAL},
+      SHORTNAME = #{shortname,jdbcType=VARCHAR},
+      LEVELTYPE = #{leveltype,jdbcType=DECIMAL},
+      CITYCODE = #{citycode,jdbcType=VARCHAR},
+      ZIPCODE = #{zipcode,jdbcType=VARCHAR},
+      MERGERNAME = #{mergername,jdbcType=VARCHAR},
+      LNG = #{lng,jdbcType=VARCHAR},
+      LAT = #{lat,jdbcType=VARCHAR},
+      PINYIN = #{pinyin,jdbcType=VARCHAR},
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <select id="selectList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select r.* from SYS_AREA r
+    where r.ID != #{id,jdbcType=DECIMAL} and r.STATUS = 1 order by r.ID
+  </select>
+  <select id="selectPageList" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    SELECT * FROM (select , t.*
+    from (select r.* from SYS_AREA r
+    where r.STATUS = 1 
+    <if test="name != null and name != '' ">
+       and r.name like concat(concat('%', #{name,jdbcType=VARCHAR}),'%')
+    </if>
+    order by r.ID)t
+   limit #{endindex,jdbcType=DECIMAL}    
+    )
+    limit #{startin,jdbcType=DECIMAL},9999999
+  </select>
+  <select id="selectTotalCount" resultType="java.lang.Integer">
+    select count(0) from SYS_AREA r
+    where r.STATUS = 1
+    <if test="name != null and name != '' ">
+       and r.name like concat(concat('%', #{name,jdbcType=VARCHAR}),'%')
+    </if>
+  </select>
+  <select id="selectListByParentId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_AREA
+    where STATUS = 1
+    and PARENTID = #{parentid,jdbcType=DECIMAL}
+    order by ID
+  </select>
+  <!-- 根据regionid获取下级所有区域集合（by prior） -->
+	<select id="selectAllList" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select * from SYS_AREA 
+		Where FIND_IN_SET(id,getChildList_SYS_AREA(#{id,jdbcType=VARCHAR}))
+		 and STATUS = 1
+		order by ID
+	</select>
+	<select id="getOrganizationidByorganizationcode" resultType="String">
+  select organizationid from sys_organization
+  where organizationcode=#{organizationcode,jdbcType=VARCHAR}
+  </select>
+	<!-- 根据组织机构编码获取区域 -->
+	 <select id="getIn" resultType="Integer">
+         select region from bus_customerfile
+	            where fatherorganizationid in (select organizationid from sys_organization 
+	            Where FIND_IN_SET(organizationid,getChildList_sys_organization(#{organizationid,jdbcType=VARCHAR}))		
+	            and status = 1           
+            )
+            and status = 1
+  </select>
+	<select id="getOtherwise" resultType="Integer">
+	select region from bus_customerfile where status = 1
+	</select>
+	<select id="selectByOrgCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+	   select r.* from sys_area r where r.STATUS = 1
+	    <choose>
+		   	  <when test="organizationcode != null and organizationcode !=''">
+		   	  and  FIND_IN_SET(id,getParList_sys_area(id)) and id in
+	   	<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+	   	#{item}
+	   	</foreach>       	  		
+		      </when>
+		      <otherwise> 
+		        and  FIND_IN_SET(id,getParList_sys_area(id)) and id in
+	      <foreach collection="lists" index="indexs" item="items" open="(" separator="," close=")">
+	   	#{items}
+	   	</foreach>      
+		      </otherwise>
+		</choose> 
+		order by r.ID
+	 </select>	
+	 <!-- 根据组织机构id获取区域 -->
+	 <select id="selectByOrgId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+	   select r.* from sys_area r where r.STATUS = 1
+	   and id in (select region from bus_customerfile
+       where fatherorganizationid in (select organizationid from sys_organization 
+       Where 	IS_PARENT_ORGANIZATION(organizationid,#{organizationid,jdbcType=VARCHAR})=1       
+       and status = 1)
+       order by r.ID
+     </select>	
+     <!-- 获取省直辖市 -->
+     <select id="selectProvince" resultMap="BaseResultMap" >
+	   select r.* from sys_area r where r.STATUS = 1
+	   and r.leveltype = 1
+       order by r.ID
+     </select>	
+     <!-- 根据省直辖市获取地级市 -->
+     <select id="selectCity" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+	   select r.* from sys_area r where r.STATUS = 1
+	   and r.leveltype = 2 and r.parentid = #{provinceid,jdbcType=DECIMAL}
+       order by r.ID
+     </select>	
+     <!-- 根据地级市获取区县 -->
+     <select id="selectCountry" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+	   select r.* from sys_area r where r.STATUS = 1
+	   and r.leveltype = 3 and r.parentid = #{cityid,jdbcType=DECIMAL}
+       order by r.ID
+     </select>	
+     
+     <!-- 根据区县获取街道 -->
+     <select id="selectStreet" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+	   select r.* from sys_area r where r.STATUS = 1
+	   and r.leveltype = 4 and r.parentid = #{countryid,jdbcType=DECIMAL}
+       order by r.ID
+     </select>	
+     
+     <!-- 获取父级 -->
+     <select id="getPar" parameterType="Integer" resultMap="BaseResultMap">
+      select r.* from sys_area r where r.STATUS = 1
+	   and r.leveltype = #{leveltype,jdbcType=INTEGER} and r.id = #{id,jdbcType=INTEGER}
+       order by r.ID
+     </select>
+  <!-- 获取特定区域 -->
+  <select id="selectByTwoDition" parameterType="Integer" resultMap="BaseResultMap">
+   select r.* from sys_area r where r.STATUS = 1
+	   and r.LEVELTYPE = #{Leveltype,jdbcType=INTEGER} and r.id = #{id,jdbcType=DECIMAL}
+       order by r.ID
+  </select>
+</mapper>

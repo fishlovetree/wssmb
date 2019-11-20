@@ -1,0 +1,566 @@
+/*三维控件容器样式*/
+#cesiumContainer {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+/* ------加载进度条开始 ------------*/
+.loadingOverlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index:999;
+    background-color: #333;
+}
+
+.loadInfo{
+	height:50px;
+	width: 200px;
+	position: relative;
+	top: 50%;
+	margin-top: -25px;
+	left: 50%;
+    margin-left: -100px;
+}
+
+.loadInfo ul#loadbar {
+	list-style: none;
+	margin: 0 auto;
+	width: 125px;
+    height: 17px;
+}
+
+.loadInfo #loadText{
+	color: #fff;
+    text-align: center;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+ul#loadbar li {
+	float: left;
+	position: relative;
+	width: 15px;
+	height: 15px;
+	border: 1px solid #fff;
+	border-radius: 50px;
+	margin-left: 10px;
+	border-left: 1px solid #111;
+	border-top: 1px solid #111;
+	border-right: 1px solid #333;
+	border-bottom: 1px solid #333;
+	background: #000;
+}
+
+ul#loadbar li:first-child {
+	margin-left: 0;
+}
+
+.ins .ball {
+	background-color: #2187e7;
+	background-image: -moz-linear-gradient(90deg, #2187e7 25%, #a0eaff);
+	background-image: -webkit-linear-gradient(90deg, #2187e7 25%, #a0eaff);
+	width: 15px;
+	height: 15px;
+	border-radius: 50px;
+	-moz-transform: scale(0);
+	-webkit-transform: scale(0);
+	-moz-animation: loading 1s linear forwards;
+	-webkit-animation: loading 1s linear forwards;
+}
+
+.ins .palse {
+	width: 15px;
+	height: 15px;
+	border-radius: 30px;
+	border: 1px solid #00c6ff;
+	box-shadow: 0 0 5px #00c6ff;
+	position: absolute;
+	top: -1px;
+	left: -1px;
+	-moz-transform: scale(0);
+	-webkit-transform: scale(0);
+	-webkit-animation: pulse 1s ease-out;
+	-moz-animation: pulse 1s ease-out;
+}
+
+@-moz-keyframes loading {
+    0%{
+	    -moz-transform: scale(0, 0);
+    }
+
+    100%{
+        -moz-transform: scale(1,1);
+    }
+}
+@-webkit-keyframes loading {
+    0%{
+	    -webkit-transform: scale(0, 0);
+    }
+
+    100%{
+        -webkit-transform: scale(1,1);
+    }
+}
+@-moz-keyframes pulse {
+    0% {
+	    -moz-transform: scale(0);
+	    opacity: 0;
+    }
+
+    10%{
+        -moz-transform: scale(1);
+        opacity: 0.5;
+    }
+    50%{
+        -moz-transform: scale(1.75);
+        opacity: 0;
+    }
+    100%{
+        -moz-transform: scale(0);
+        opacity: 0;
+    }
+}
+@-webkit-keyframes pulse {
+    0% {
+	    -webkit-transform: scale(0);
+	    opacity: 0;
+    }
+
+    10%{
+        -webkit-transform: scale(1);
+        opacity: 0.5;
+    }
+    50%{
+        -webkit-transform: scale(1.75);
+        opacity: 0;
+    }
+    100%{
+        -webkit-transform: scale(0);
+        opacity: 0;
+    }
+}
+#loadinglayer1 {
+	-moz-animation-delay: 0.5s;
+	-webkit-animation-delay: 0.5s;
+}
+
+#loadinglayer2 {
+	-moz-animation-delay: 1s;
+	-webkit-animation-delay: 1s;
+}
+
+#loadinglayer3 {
+	-moz-animation-delay: 1.5s;
+	-webkit-animation-delay: 1.5s;
+}
+
+#loadinglayer4 {
+	-moz-animation-delay: 2s;
+	-webkit-animation-delay: 2s;
+}
+
+#loadinglayer5 {
+	-moz-animation-delay: 2.5s;
+	-webkit-animation-delay: 2.5s;
+}
+
+#loadinglayer7 {
+	-moz-animation-delay: 1.5s;
+	-webkit-animation-delay: 1.5s;
+}
+
+#loadinglayer8 {
+	-moz-animation-delay: 2s;
+	-webkit-animation-delay: 2s;
+}
+
+#loadinglayer9 {
+	-moz-animation-delay: 2.5s;
+	-webkit-animation-delay: 2.5s;
+}
+
+#loadinglayer10 {
+	-moz-animation-delay: 3s;
+	-webkit-animation-delay: 3s;
+}
+
+#loadinglayer11 {
+	-moz-animation-delay: 3.5s;
+	-webkit-animation-delay: 3.5s;
+}
+
+@-moz-keyframes fill {
+    0%{
+	    opacity: 0;
+    }
+
+    100%{
+        opacity: 1;
+    }
+}
+@-webkit-keyframes fill {
+    0%{
+	    opacity: 0;
+    }
+
+    100%{
+        opacity: 1;
+    }
+}
+/* ------加载进度条结束 ------------*/
+
+/* ------鼠标右键样式开始-----*/
+ .wsContextmenu{
+ 	   display:none;
+       background-color: #fff;
+       position:absolute;
+       top: 0px;
+       left: 0px;
+       z-index: 101;
+       cursor:default;
+       box-shadow: -2px -2px 1px rgba(0,0,0,.3);
+       border:1px solid #ddd;
+   }
+.wsContextmenu ul{
+	list-style: none;
+	width: 70px;
+	padding:5px;
+	margin: 0px;
+	text-align: center;
+}
+.wsContextmenu ul li{
+    height: 30px;
+    line-height: 30px;
+    border-radius: 3px;
+}
+.wsContextmenu ul li:hover a{
+    text-decoration: underline;
+    cursor: pointer;
+}
+/* ------鼠标右键样式结束-----*/
+
+ /*--设置弹出框样式--*/
+ .popup {
+     position: absolute;
+     background-color: #eeeeee;
+     -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+     filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+     border-radius: 5px;
+     border: 1px solid #cccccc;
+     width: 270px;
+     z-index:101;
+     top: 0px;
+      left: 0px;
+     display:none;
+ }
+ .popup:after, .popup:before {
+     top: 100%;
+     border: solid transparent;
+     content: " ";
+     height: 0;
+     width: 0;
+     position: absolute;
+     pointer-events: none;
+ }
+ .popup:after {
+     border-top-color: #eeeeee;
+     border-width: 10px;
+     left: 50%;
+     margin-left: -10px;
+ }
+ .popup:before {
+     border-top-color: #cccccc;
+     border-width: 11px;
+     left: 50%;
+     margin-left: -11px;
+ }
+ .pophead{
+     width:100%;
+     height:30px;
+     background-color:#fb9d48;
+     border-radius: 5px 5px 0 0;
+ }
+ .popup-title{
+     font:bold 15px sans-serif;
+     color: #fff;
+     margin-left: 10px;
+     line-height: 30px;
+ }
+ .popup-content{
+     padding: 0px 20px 10px;
+ }
+ .popup-closer {
+     text-decoration: none;
+     position: absolute;
+     top: 2px;
+     right: 8px;
+     color:#fff !important;
+     font-size: 16px;
+ }
+ .popup-closer:after {
+     content: "✖";
+ }
+ /*设置弹出框表格中th、td的样式*/
+ .popupTable th,.popupTable td{
+     font-size: 12px;
+     line-height: 20px;
+     color: #4D4D4D;
+     font-weight: normal;
+     text-align: left;
+ }
+	    
+/*建筑树样式开始*/
+#buildingTreeContainer{
+	width:250px;
+	height:350px;
+ 	position:absolute;
+ 	left:0px;
+ 	top:50%;
+ 	z-index:101;
+ 	margin-top:-175px;
+	color: rgb(60, 60, 60);
+	border:1px solid #bbb;
+	background-color:#eee;
+	font-size:12px;
+}
+.buildingTreeHeader{
+	height:35px;
+ 	line-height: 35px;
+ 	font-size: 14px;
+ 	padding-left: 15px;
+ 	font-weight: bold;
+ 	border-bottom:1px solid #bbb;
+}
+.buildingTreeHeader a{
+    height: 22px;
+ 	width: 22px;
+ 	float: right;
+ 	margin: 8px;
+ 	background-image:url('../../images/gis/arrows.png');
+}
+.buildingTreeHeader a.collapse{				/*折叠状态*/
+	background-position: 0 -22px;
+}
+#buildingTree{
+	overflow: auto;
+ 	width: 250px;
+ 	height:310px;
+}
+/*建筑树样式结束*/
+ 
+/*设置告警框样式开始*/
+.alarmPop {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    z-index:101;
+    color:#fff;
+    background: #fb9d48;
+    border: 1px solid #fb9d48;
+    display:none;
+}
+#alarmPopHeader{
+	height:20px;
+}
+
+#alarmPic{
+   height: 20px;
+   width: 20px;
+   float: left;
+   margin:0 5px;
+   background-image:url('../../images/gis/alarm.png');
+   background-size:20px;
+}
+.alarmcontent{
+	float: left;
+	width:250px;
+	height:150px;
+	margin: 5px;
+	color: #666;
+    background-color: #fff;
+    font-size:12px;
+    overflow:auto;
+}
+.alarmcontentItem{
+	border-bottom:1px solid 
+	padding-left: 15px;
+	cursor:pointer;
+}
+.alarmcontentItem:hover{
+	color:#888;
+}
+.alarmcontentItem i{
+	padding:0 5px;
+}
+/*告警框样式结束*/
+
+/*右侧菜单按钮样式开始*/
+.rightMenu{
+	position:absolute;
+	right:10px;
+	top:20px;
+	z-index:101;
+}
+.rightMenuItem a{
+	display: block;
+   height: 40px;
+   width: 40px;
+   background-color: rgba(0,0,0,0.6);
+}
+.rightMenuItem a:hover{
+   background-color: rgba(0,0,0,0.5);
+}
+.rightMenuItem a.active{
+   background-color: rgba(0,0,0,0.3);
+}
+.rightMenuItem a i{
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+ 	margin: 10px;
+ 	color:#eee;
+ 	text-align: center;
+ 	font-size:18px;
+}
+.rightMenuItem.wsZoomIn{
+	margin-top:10px;
+}
+/*右侧菜单按钮样式结束*/
+
+/*搜索框样式开始*/
+#equipmentSearchbar{
+ 	position:absolute;
+    right:55px;
+    top:60px;
+    z-index:101;
+ 	width:250px;
+ 	height:350px;
+ 	color: rgb(60, 60, 60);
+ 	border:1px solid #bbb;
+ 	background-color:#eee;
+ 	font-size:12px;
+ 	display:none;
+ }
+ .searchbarHeader{
+ 	height:35px;
+    line-height: 35px;
+    font-size: 14px;
+    padding-left: 15px;
+    font-weight: bold;
+    border-bottom:1px solid #bbb;
+ }
+ #searchbtn {
+  	 position: absolute;
+     right: 10px;
+     top: 40px;
+     width: 25px;
+     height: 25px;
+     cursor: pointer;
+ }
+ #searchText {
+     box-sizing: border-box;
+     text-indent: 2px;
+     border: none;
+     width: 160px;
+     height: 20px;
+     margin:7px;
+     line-height: 20px;
+     padding: 0;
+     letter-spacing: .5px;
+     font-size: 14px;
+ }
+
+ .resultList{
+     margin-top: -5px;
+     background: #fff;
+     top: 45px;
+     left: 0;
+     border: none;
+     border-top: 1px solid #E4E6E7;
+     max-width: 300px;
+ }
+ .resultListItem{
+     background-color: #fff;
+     white-space: nowrap;
+     height: 32px;
+     line-height: 32px;
+     cursor: pointer;
+     background-repeat: no-repeat;
+     background-size: 40px;
+     font-size: 13px;
+     overflow: hidden;
+     color: #404040;
+ }
+ .resultListItem:hover{
+     background-color: rgba(0,0,0,0.1);
+ }
+.positionPic{
+    height: 20px;
+ 	width: 20px;
+ 	line-height: 20px;
+ 	font-size: 18px;
+ 	float: left;
+ 	margin: 6px;
+}
+/*搜索框样式结束*/
+
+/*绘制的提示信息样式*/
+.tooltip_draw{
+    position: absolute;
+    z-index: 101;
+    font-size: 12px;
+    line-height: 14px;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 3px 7px 3px 2px;
+    white-space: nowrap;
+    color: #565656;
+}
+   
+/*选中删除的按钮样式*/
+#closePoint{
+	width:16px;
+    height:16px;
+    cursor:pointer;
+	background-image:url('../../images/gis/close.png');
+	background-color:#fff;
+    position:absolute;
+    top:10px;
+    left:10px;
+    z-index:101;
+    display:none;
+}
+
+/*分割线的样式*/
+#floorInfo{
+    position: absolute;
+    z-index: 5;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    max-width: 100px;
+    top: 30px;
+    right: 13px;
+    white-space: nowrap;
+    background-color: #fff;	
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.5);
+}
+.floorItemLine{
+    border-bottom: 1px solid #888;
+}
+.floorItem{
+	padding: 2px 5px;
+}
+.floorItem.selected{
+	background-color:#f7ca66;
+}

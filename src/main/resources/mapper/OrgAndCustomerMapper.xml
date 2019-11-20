@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.OrgAndCustomerMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.OrgAndCustomer" >
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="PARENTID" property="parentid" jdbcType="DECIMAL" />
+    <result column="TYPE" property="type" jdbcType="DECIMAL" />
+    <result column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="PARENTCODE" property="parentcode" jdbcType="VARCHAR" />
+    
+    <result column="UNITNATURE" property="unitnature" jdbcType="VARCHAR" />
+    <result column="UNITCATEGORY" property="unitcategory" jdbcType="VARCHAR" />
+    <result column="INDUSTRY" property="industry" jdbcType="VARCHAR" />
+  </resultMap>
+	<!--根据组织机构代码获取子集 -->
+	<select id="selectListByCode" resultMap="BaseResultMap">
+        select o.*, c.UNITNATURE, c.UNITCATEGORY, c.INDUSTRY
+        from view_organization o
+		left join bus_customerfile c on c.code=o.code
+        <if test="organizationcode != null and organizationcode !=''" >
+        Where FIND_IN_SET(o.code,getChildList(#{organizationcode,jdbcType=VARCHAR}))	
+        </if>
+        order by o.id
+	</select>
+	
+	<!--根据组织机构代码获取子集 (用户集合)-->
+	<select id="selectCustomerArrayByCode" resultType="java.lang.Integer">
+        select ID from view_organization  where TYPE=2
+        <if test="organizationcode != null and organizationcode !=''" >
+		and  FIND_IN_SET(o.code,getChildList(#{organizationcode,jdbcType=VARCHAR}))			
+        </if>
+        
+	</select>
+	
+	<!--根据组织机构代码获取子集 (用户集合)-->
+	<select id="selectCustomerListByCode" resultMap="BaseResultMap">
+        select ID,CODE,NAME,TYPE from view_organization  where TYPE=2
+        <if test="organizationcode != null and organizationcode !=''" >
+        Where FIND_IN_SET(code,getChildList(#{organizationcode,jdbcType=VARCHAR}))			
+        </if>
+        
+	</select>
+	
+	<!--获取组织机构和用户代码集合 -->
+	<select id="selectOrgAndCustomersBycode" resultMap="BaseResultMap">
+		select
+		ID, CODE, NAME, PARENTID, TYPE
+		from view_organization 
+		where code= #{code,jdbcType=VARCHAR}
+	</select>
+</mapper>

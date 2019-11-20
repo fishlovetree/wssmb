@@ -1,0 +1,976 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.BusFaultMapper">
+	<resultMap id="BaseResultMap"
+		type="com.ssm.wssmb.model.BusFault">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="measureAddress" property="measureaddress"
+			jdbcType="VARCHAR" />
+		<result column="equipmentAddress" property="equipmentaddress"
+			jdbcType="VARCHAR" />
+		<result column="systemType" property="systemtype"
+			jdbcType="INTEGER" />
+		<result column="faultType" property="faulttype"
+			jdbcType="INTEGER" />
+		<result column="cumulativeNumber" property="cumulativenum"
+			jdbcType="INTEGER" />
+		<result column="occurTime" property="occurtime"
+			jdbcType="TIMESTAMP" />
+		<result column="endTime" property="endtime"
+			jdbcType="TIMESTAMP" />
+		<result column="handlePeople" property="handlepeople"
+			jdbcType="VARCHAR" />
+		<result column="processTime" property="processtime"
+			jdbcType="TIMESTAMP" />
+		<result column="processMethod" property="processmethod"
+			jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="remarks" property="remarks" jdbcType="DECIMAL" />
+		<result column="insertionTime" property="insertionTime"
+			jdbcType="TIMESTAMP" />
+		<result column="processRemarks" property="processremarks"
+			jdbcType="VARCHAR" />
+		<result column="channelNo" property="channelNo"
+			jdbcType="INTEGER" />
+		<result column="endMethod" property="endMethod"
+			jdbcType="INTEGER" />
+		<result column="endPeople" property="endPeople"
+			jdbcType="INTEGER" />
+		<result column="note" property="note" jdbcType="VARCHAR" />
+		<result column="measureName" property="measureName"
+			jdbcType="VARCHAR" />
+		<result column="equipname" property="equipname"
+			jdbcType="VARCHAR" />
+		<result column="measureAddress" property="measureAddress"
+			jdbcType="TIMESTAMP" />
+		<result column="terminalName" property="terminalName"
+			jdbcType="VARCHAR" />
+		<result column="terminalAddress" property="terminalAddress"
+			jdbcType="TIMESTAMP" />
+		<result column="installationLocation"
+			property="installationLocation" jdbcType="VARCHAR" />
+		<result column="Address" property="address" jdbcType="VARCHAR" />
+		<!-- 故障名称 -->
+		<result column="FAULTNAME" property="faultname"
+			jdbcType="VARCHAR" />
+		<result column="EQUIPMENTTYPENAME" property="equipmenttypename"
+			jdbcType="VARCHAR" />
+			<result column="type" property="type"
+			jdbcType="INTEGER" />
+		<result column="equipId" property="equipId"
+			jdbcType="INTEGER" />
+	</resultMap>
+
+	<select id="queryFault" resultMap="BaseResultMap">
+		SELECT * FROM (SELECT
+		f.*,m.MeasureName,m.Address
+		,t.terminalName,t.address AS
+		equipaddress,t.installationLocation,cd.DETAILNAME
+		FROM (bus_fault
+		f,mb_measurefile m,mb_terminal t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE
+		f.measureAddress=m.MeasureNumber AND f.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT
+		f.*,m.MeasureName,m.Address,a.ammeterName,a.ammeterCode,a.installAddress,cd.DETAILNAME
+		FROM (bus_fault f,mb_measurefile m,mb_ammeter a)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL cd ON f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE f.measureAddress=m.MeasureNumber AND
+		f.equipmentAddress=a.ammeterCode
+		and a.boxCode=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="faulttype != null and faulttype != ''">
+			and cast(g.faulttype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and g.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (g.endtime='' or g.endtime is null)
+			</when>
+			<when test="end == 1">
+				and g.endtime is not null
+			</when>
+		</choose>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="queryFaultCount" resultType="java.lang.Integer">
+		SELECT count(0) FROM (SELECT
+		f.*,m.MeasureName,m.Address
+		,t.terminalName,t.address AS
+		equipaddress,t.installationLocation,cd.DETAILNAME
+		FROM (bus_fault
+		f,mb_measurefile m,mb_terminal t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE
+		f.measureAddress=m.MeasureNumber AND f.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT
+		f.*,m.MeasureName,m.Address,a.ammeterName,a.ammeterCode,a.installAddress,cd.DETAILNAME
+		FROM (bus_fault f,mb_measurefile m,mb_ammeter a)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL cd ON f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE f.measureAddress=m.MeasureNumber AND
+		f.equipmentAddress=a.ammeterCode
+		and a.boxCode=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="faulttype != null and faulttype != ''">
+			and cast(g.faulttype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and g.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (g.endtime='' or g.endtime is null)
+			</when>
+			<when test="end == 1">
+				and g.endtime is not null
+			</when>
+		</choose>
+	</select>
+
+	<select id="selectTerminalFault" resultMap="BaseResultMap">
+		SELECT * FROM (SELECT
+		f.*,m.MeasureName,m.Address
+		,t.terminalName,t.address AS
+		equipaddress,t.installationLocation,cd.DETAILNAME
+		FROM (bus_fault
+		f,mb_measurefile m,mb_terminal t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE
+		f.measureAddress=m.MeasureNumber AND f.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.terminalId=#{id,jdbcType=INTEGER})g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="faulttype != null and faulttype != ''">
+			and cast(g.faulttype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and g.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (g.endtime='' or g.endtime is null)
+			</when>
+			<when test="end == 1">
+				and g.endtime is not null
+			</when>
+		</choose>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByTerminalFaultCount"
+		resultType="java.lang.Integer">
+		SELECT count(0) FROM (SELECT
+		f.*,m.MeasureName,m.Address
+		,t.terminalName,t.address AS
+		equipaddress,t.installationLocation,cd.DETAILNAME
+		FROM (bus_fault
+		f,mb_measurefile m,mb_terminal t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE
+		f.measureAddress=m.MeasureNumber AND f.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.terminalId=#{id,jdbcType=INTEGER})g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="faulttype != null and faulttype != ''">
+			and cast(g.faulttype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and g.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (g.endtime='' or g.endtime is null)
+			</when>
+			<when test="end == 1">
+				and g.endtime is not null
+			</when>
+		</choose>
+	</select>
+	
+	<select id="selectAmmeterFault" resultMap="BaseResultMap">
+		SELECT * FROM (SELECT
+		f.*,m.MeasureName,m.Address
+		,t.ammeterName as terminalName,t.ammeterCode AS
+		equipaddress,t.installAddress as installationLocation,cd.DETAILNAME
+		FROM (bus_fault
+		f,mb_measurefile m,mb_ammeter t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE
+		f.measureAddress=m.MeasureNumber AND f.equipmentAddress=t.ammeterCode
+		AND
+		t.boxCode=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.id=#{id,jdbcType=INTEGER})g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="faulttype != null and faulttype != ''">
+			and cast(g.faulttype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and g.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (g.endtime='' or g.endtime is null)
+			</when>
+			<when test="end == 1">
+				and g.endtime is not null
+			</when>
+		</choose>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByAmmeterFaultCount"
+		resultType="java.lang.Integer">
+		SELECT count(0) FROM (SELECT
+		f.*,m.MeasureName,m.Address
+		,t.ammeterName,t.ammeterCode AS
+		equipaddress,t.installAddress,cd.DETAILNAME
+		FROM (bus_fault
+		f,mb_measurefile m,mb_ammeter t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE
+		f.measureAddress=m.MeasureNumber AND f.equipmentAddress=t.ammeterCode
+		AND
+		t.boxCode=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.id=#{id,jdbcType=INTEGER})g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="faulttype != null and faulttype != ''">
+			and cast(g.faulttype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and g.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (g.endtime='' or g.endtime is null)
+			</when>
+			<when test="end == 1">
+				and g.endtime is not null
+			</when>
+		</choose>
+	</select>
+
+	<select id="selectEquipmentFault" resultMap="BaseResultMap">
+		SELECT * FROM (SELECT
+		f.*,m.MeasureName,m.Address
+		,t.terminalName,t.address AS
+		equipaddress,t.installationLocation,cd.DETAILNAME
+		FROM (bus_fault
+		f,mb_measurefile m,mb_terminal t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE
+		f.measureAddress=m.MeasureNumber AND f.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND ${terdition}
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT
+		f.*,m.MeasureName,m.Address,a.ammeterName,a.ammeterCode,a.installAddress,cd.DETAILNAME
+		FROM (bus_fault f,mb_measurefile m,mb_ammeter a)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL cd ON f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE f.measureAddress=m.MeasureNumber AND
+		f.equipmentAddress=a.ammeterCode
+		and a.boxCode=m.MeasureId
+		and
+		${amdition}
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="faulttype != null and faulttype != ''">
+			and cast(g.faulttype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and g.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (g.endtime='' or g.endtime is null)
+			</when>
+			<when test="end == 1">
+				and g.endtime is not null
+			</when>
+		</choose>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByEquipmentFaultCount"
+		resultType="java.lang.Integer">
+		SELECT count(0) FROM (SELECT
+		f.*,m.MeasureName,m.Address
+		,t.terminalName,t.address AS
+		equipaddress,t.installationLocation,cd.DETAILNAME
+		FROM (bus_fault
+		f,mb_measurefile m,mb_terminal t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE
+		f.measureAddress=m.MeasureNumber AND f.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND ${terdition}
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT
+		f.*,m.MeasureName,m.Address,a.ammeterName,a.ammeterCode,a.installAddress,cd.DETAILNAME
+		FROM (bus_fault f,mb_measurefile m,mb_ammeter a)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL cd ON f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE f.measureAddress=m.MeasureNumber AND
+		f.equipmentAddress=a.ammeterCode
+		and a.boxCode=m.MeasureId
+		and
+		${amdition}
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="faulttype != null and faulttype != ''">
+			and cast(g.faulttype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and g.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (g.endtime='' or g.endtime is null)
+			</when>
+			<when test="end == 1">
+				and g.endtime is not null
+			</when>
+		</choose>
+	</select>
+
+	<select id="selectRegionFault" resultMap="BaseResultMap">
+		SELECT * FROM (SELECT
+		gg.id as reig,f.*,m.MeasureName,m.Address
+		,t.terminalName,t.address AS
+		equipaddress,t.installationLocation,cd.DETAILNAME
+		FROM (bus_fault
+		f,mb_measurefile m,mb_terminal t,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE
+		f.measureAddress=m.MeasureNumber AND f.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND m.Region=gg.id
+		UNION
+		SELECT
+		gg.id as
+		reig,f.*,m.MeasureName,m.Address,a.ammeterName,a.ammeterCode,a.installAddress,cd.DETAILNAME
+		FROM (bus_fault f,mb_measurefile m,mb_ammeter a,(SELECT id FROM
+		view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT
+		JOIN
+		SYS_CONSTANTDETAIL cd ON f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE f.measureAddress=m.MeasureNumber AND
+		f.equipmentAddress=a.ammeterCode
+		and a.boxCode=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND m.Region=gg.id
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="faulttype != null and faulttype != ''">
+			and cast(g.faulttype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and g.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (g.endtime='' or g.endtime is null)
+			</when>
+			<when test="end == 1">
+				and g.endtime is not null
+			</when>
+		</choose>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByRegionFaultCount"
+		resultType="java.lang.Integer">
+		SELECT count(0) FROM (SELECT
+		gg.id as reig,f.*,m.MeasureName,m.Address
+		,t.terminalName,t.address AS
+		equipaddress,t.installationLocation,cd.DETAILNAME
+		FROM (bus_fault
+		f,mb_measurefile m,mb_terminal t,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE
+		f.measureAddress=m.MeasureNumber AND f.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND m.Region=gg.id
+		UNION
+		SELECT
+		gg.id as
+		reig,f.*,m.MeasureName,m.Address,a.ammeterName,a.ammeterCode,a.installAddress,cd.DETAILNAME
+		FROM (bus_fault f,mb_measurefile m,mb_ammeter a,(SELECT id FROM
+		view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT
+		JOIN
+		SYS_CONSTANTDETAIL cd ON f.faulttype=cd.DETAILVALUE AND
+		cd.CODING=1084
+		WHERE f.measureAddress=m.MeasureNumber AND
+		f.equipmentAddress=a.ammeterCode
+		and a.boxCode=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND m.Region=gg.id)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.insertionTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="faulttype != null and faulttype != ''">
+			and cast(g.faulttype as SIGNED ) =
+			#{alarmtype,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.terminalName like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipmentAddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="status != null  and status != 2">
+			and g.status = #{status,jdbcType=INTEGER}
+		</if>
+		<choose>
+			<when test="end == 0">
+				and (g.endtime='' or g.endtime is null)
+			</when>
+			<when test="end == 1">
+				and g.endtime is not null
+			</when>
+		</choose>
+	</select>
+
+	<update id="updateByPrimaryKeySelective"
+		parameterType="com.ssm.wssmb.model.BusFault">
+		update bus_fault
+		<set>
+			<if test="measureaddress != null">
+				measureAddress = #{measureaddress,jdbcType=VARCHAR},
+			</if>
+			<if test="equipmentaddress != null">
+				equipmentAddress = #{equipmentaddress,jdbcType=VARCHAR},
+			</if>
+			<if test="systemtype != null">
+				systemType = #{systemtype,jdbcType=INTEGER},
+			</if>
+			<if test="faulttype != null">
+				faultType = #{faulttype,jdbcType=INTEGER},
+			</if>
+			<if test="cumulativenum != null">
+				cumulativeNumber = #{cumulativenum,jdbcType=INTEGER},
+			</if>
+			<if test="occurtime != null">
+				occurTime = #{occurtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endtime != null">
+				endTime = #{endtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="handlepeople != null">
+				handlePeople = #{handlepeople,jdbcType=VARCHAR},
+			</if>
+			<if test="processtime != null">
+				processTime = #{processtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="processmethod != null">
+				processMethod = #{processmethod,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="remarks != null">
+				remarks = #{remarks,jdbcType=VARCHAR},
+			</if>
+			<if test="processremarks != null">
+				processRemarks = #{processremarks,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where ID = #{id,jdbcType=INTEGER}
+	</update>
+
+	<update id="updateEndTime" parameterType="java.lang.Integer">
+		update bus_fault
+		set
+		endTime = sysdate()
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<!-- 统计故障率 -->
+	<select id="statisticsFaultList" resultMap="BaseResultMap">
+	select * from (	SELECT
+		u.username as handlepeople,m.MeasureName,w.measureAddress,w.equipmentAddress,w.systemType,w.faultType,w.cumulativeNumber
+		,w.occurTime,w.endTime,w.processTime,w.processMethod,w.status,w.remarks,w.insertionTime,w.processRemarks,w.endMethod,
+		w.equipId,w.type,
+		cd.DETAILNAME
+		faultname,ct.detailname as equipmenttypename
+		FROM
+		(bus_fault w,(SELECT
+		id
+		FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg,mb_terminal t)
+		left
+		join SYS_CONSTANTDETAIL cd on w.faultType=cd.DETAILVALUE and
+		cd.CODING=1084 and cd.status=1
+		left join sys_constantdetail ct on
+		ct.coding ='1007'and ct.detailvalue =
+		w.faultType and ct.status=1
+		left
+		join sys_user u on
+		u.id=w.HANDLEPEOPLE
+		left join mb_measurefile m on
+		m.MeasureNumber=w.measureAddress
+		where w.id is not null
+		AND
+		m.Region=gg.id
+		and
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		and t.address=w.equipmentAddress and w.type=2
+		union
+		SELECT
+		u.username as handlepeople,m.MeasureName,w.measureAddress,w.equipmentAddress,w.systemType,w.faultType,w.cumulativeNumber
+		,w.occurTime,w.endTime,w.processTime,w.processMethod,w.status,w.remarks,w.insertionTime,w.processRemarks,w.endMethod,
+		w.equipId,w.type,
+		cd.DETAILNAME
+		faultname,ct.detailname as equipmenttypename
+		FROM
+		(bus_fault w,(SELECT
+		id
+		FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg,mb_ammeter t)
+		left
+		join SYS_CONSTANTDETAIL cd on w.faultType=cd.DETAILVALUE and
+		cd.CODING=1084 and cd.status=1
+		left join sys_constantdetail ct on
+		ct.coding ='1007'and ct.detailvalue =
+		w.faultType and ct.status=1
+		left
+		join sys_user u on
+		u.id=w.HANDLEPEOPLE
+		left join mb_measurefile m on
+		m.MeasureNumber=w.measureAddress
+		where w.id is not null
+		AND
+		m.Region=gg.id
+		and
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		and t.ammeterCode=w.equipmentAddress and w.type=3)w
+		where 1=1
+		<if test="year != null and year != ''">
+			and cast(date_format(w.insertionTime,'%Y') as
+			SIGNED)=#{year,jdbcType=VARCHAR}
+		</if>
+		<if test="month != null and month != ''">
+			and cast(date_format(w.insertionTime,'%m')as
+			SIGNED)=#{month,jdbcType=VARCHAR}
+		</if>
+		<if test="day != null and day != ''">
+			and cast(date_format(w.insertionTime,'%d')as
+			SIGNED)=#{day,jdbcType=VARCHAR}
+		</if>
+		<if test="hour != null and hour != ''">
+			and cast(date_format(w.insertionTime,'%H')as
+			SIGNED)=#{hour,jdbcType=VARCHAR}
+		</if>
+		ORDER BY w.insertionTime DESC,w.occurTime DESC
+	</select>
+
+	<select id="measureFaultList" resultMap="BaseResultMap">
+		select * from(SELECT u.username,m.MeasureName,f.*,cd.DETAILNAME
+		faultname,ct.detailname AS equipmenttypename,t.terminalName as
+		equipname,t.installationLocation as installationLocation
+		FROM
+		(bus_fault
+		f,mb_terminal t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faultType=cd.DETAILVALUE AND
+		cd.CODING=1084 AND cd.status=1
+		LEFT JOIN
+		sys_constantdetail ct ON
+		ct.coding ='1007'AND ct.detailvalue =
+		f.faultType AND ct.status=1
+		LEFT
+		JOIN sys_user u ON
+		u.id=f.HANDLEPEOPLE
+		LEFT JOIN mb_measurefile m ON
+		m.MeasureNumber=f.measureAddress
+		WHERE
+		f.type=2 AND
+		f.equipId=t.terminalId
+		and ${terdition}
+		UNION
+		SELECT
+		u.username,m.MeasureName,f.*,cd.DETAILNAME
+		faultname,ct.detailname AS
+		equipmenttypename,a.ammeterName as equipname,a.installAddress as
+		installationLocation
+		FROM (bus_fault f,mb_ammeter a)
+		LEFT JOIN sys_user u
+		ON
+		u.id=f.HANDLEPEOPLE
+		LEFT JOIN mb_measurefile m ON
+		m.MeasureNumber=f.measureAddress
+		LEFT JOIN
+		SYS_CONSTANTDETAIL cd ON
+		f.faultType=cd.DETAILVALUE AND
+		cd.CODING=1084
+		AND cd.status=1
+		LEFT JOIN
+		sys_constantdetail ct ON
+		ct.coding ='1007'AND
+		ct.detailvalue =
+		f.faultType AND ct.status=1
+		WHERE f.type=3 AND
+		f.equipId=a.id
+		and
+		${amdition}
+		)g
+		where 1=1
+		<if test="year != null and year != ''">
+			and cast(date_format(g.insertionTime,'%Y') as
+			SIGNED)=#{year,jdbcType=VARCHAR}
+		</if>
+		<if test="month != null and month != ''">
+			and cast(date_format(g.insertionTime,'%m')as
+			SIGNED)=#{month,jdbcType=VARCHAR}
+		</if>
+		<if test="day != null and day != ''">
+			and cast(date_format(g.insertionTime,'%d')as
+			SIGNED)=#{day,jdbcType=VARCHAR}
+		</if>
+		<if test="hour != null and hour != ''">
+			and cast(date_format(g.insertionTime,'%H')as
+			SIGNED)=#{hour,jdbcType=VARCHAR}
+		</if>
+		ORDER BY g.insertionTime DESC,g.occurTime DESC
+	</select>
+
+	<select id="terminalFaultList" resultMap="BaseResultMap">
+		SELECT u.username AS handlepeople,m.MeasureName,f.*,cd.DETAILNAME
+		faultname,ct.detailname AS equipmenttypename,t.terminalName as
+		equipname,t.installationLocation as installationLocation
+		FROM
+		(bus_fault f,mb_terminal t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faultType=cd.DETAILVALUE AND
+		cd.CODING=1084 AND cd.status=1
+		LEFT JOIN
+		sys_constantdetail ct ON
+		ct.coding ='1007'AND ct.detailvalue =
+		f.faultType AND ct.status=1
+		LEFT
+		JOIN sys_user u ON
+		u.id=f.HANDLEPEOPLE
+		LEFT JOIN mb_measurefile m ON
+		m.MeasureNumber=f.measureAddress
+		WHERE
+		f.type=2 AND
+		f.equipId=t.terminalId
+		and
+		t.terminalId=#{id,jdbcType=INTEGER}
+		<if test="year != null and year != ''">
+			and cast(date_format(f.insertionTime,'%Y') as
+			SIGNED)=#{year,jdbcType=VARCHAR}
+		</if>
+		<if test="month != null and month != ''">
+			and cast(date_format(f.insertionTime,'%m')as
+			SIGNED)=#{month,jdbcType=VARCHAR}
+		</if>
+		<if test="day != null and day != ''">
+			and cast(date_format(f.insertionTime,'%d')as
+			SIGNED)=#{day,jdbcType=VARCHAR}
+		</if>
+		<if test="hour != null and hour != ''">
+			and cast(date_format(f.insertionTime,'%H')as
+			SIGNED)=#{hour,jdbcType=VARCHAR}
+		</if>
+		ORDER BY f.insertionTime DESC,f.occurTime DESC
+	</select>
+	
+	<select id="ammeterFaultList" resultMap="BaseResultMap">
+		SELECT u.username AS handlepeople,m.MeasureName,f.*,cd.DETAILNAME
+		faultname,ct.detailname AS equipmenttypename,t.ammeterName as
+		equipname,t.installAddress as installationLocation
+		FROM
+		(bus_fault f,mb_ammeter t)
+		LEFT JOIN SYS_CONSTANTDETAIL cd ON
+		f.faultType=cd.DETAILVALUE AND
+		cd.CODING=1084 AND cd.status=1
+		LEFT JOIN
+		sys_constantdetail ct ON
+		ct.coding ='1007'AND ct.detailvalue =
+		f.faultType AND ct.status=1
+		LEFT
+		JOIN sys_user u ON
+		u.id=f.HANDLEPEOPLE
+		LEFT JOIN mb_measurefile m ON
+		m.MeasureNumber=f.measureAddress
+		WHERE
+		f.type=3 AND
+		f.equipId=t.id
+		and
+		t.id=#{id,jdbcType=INTEGER}
+		<if test="year != null and year != ''">
+			and cast(date_format(f.insertionTime,'%Y') as
+			SIGNED)=#{year,jdbcType=VARCHAR}
+		</if>
+		<if test="month != null and month != ''">
+			and cast(date_format(f.insertionTime,'%m')as
+			SIGNED)=#{month,jdbcType=VARCHAR}
+		</if>
+		<if test="day != null and day != ''">
+			and cast(date_format(f.insertionTime,'%d')as
+			SIGNED)=#{day,jdbcType=VARCHAR}
+		</if>
+		<if test="hour != null and hour != ''">
+			and cast(date_format(f.insertionTime,'%H')as
+			SIGNED)=#{hour,jdbcType=VARCHAR}
+		</if>
+		ORDER BY f.insertionTime DESC,f.occurTime DESC
+	</select>
+	
+	<select id="getTerminalNameByEquipId" resultType="com.ssm.wssmb.model.Terminal">
+	select terminalName,installationLocation from mb_terminal 
+	where terminalId=#{equipId,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getAmmeterNameByEquipId" resultType="com.ssm.wssmb.model.MbAmmeter">
+	select ammeterName,installAddress from mb_ammeter 
+	where id=#{equipId,jdbcType=INTEGER}
+	</select>
+</mapper>

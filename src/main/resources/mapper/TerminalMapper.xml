@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.TerminalMapper">
+	<resultMap id="BaseResultMap" type="com.ssm.wssmb.model.Terminal">
+		<id column="terminalId" property="terminalId" jdbcType="INTEGER" />
+		<result column="terminalName" property="terminalName" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="installationLocation" property="installationLocation"
+			jdbcType="VARCHAR" />
+		<result column="concentratorId" property="concentratorId"
+			jdbcType="INTEGER" />
+		<result column="organizationId" property="organizationId"
+			jdbcType="INTEGER" />
+		<result column="region" property="region" jdbcType="INTEGER" />
+		<result column="manufacturer" property="manufacturer" jdbcType="VARCHAR" />
+		<result column="produceDate" property="produceDate" jdbcType="TIMESTAMP" />
+		<result column="creater" property="creater" jdbcType="VARCHAR" />
+		<result column="createDate" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="measureId" property="measureId" jdbcType="INTEGER" />
+		<result column="terminalType" property="terminalType" jdbcType="INTEGER" />
+		<result column="softType" property="softType" jdbcType="VARCHAR" />
+		<result column="hardType" property="hardType" jdbcType="VARCHAR" />
+		<result column="COMMUNICATIONSTATUS" property="COMMUNICATIONSTATUS"
+			jdbcType="INTEGER" />
+		<result column="DOWNSTATUS" property="DOWNSTATUS" jdbcType="INTEGER" />
+		<result column="hardType" property="hardType" jdbcType="VARCHAR" />
+		<result column="freezingtype" property="freezingtype" jdbcType="INTEGER" />
+		<association property="concentrator" javaType="com.ssm.wssmb.model.Concentrator">
+			<result property="concentratorName" column="concentratorName"
+				jdbcType="VARCHAR" />
+		</association>
+		<association property="measureFile" javaType="com.ssm.wssmb.model.MeasureFile">
+			<result property="measureName" column="MeasureName" jdbcType="VARCHAR" />
+		</association>
+		<association property="organization" javaType="com.ssm.wssmb.model.Organization">
+			<result property="organizationname" column="ORGANIZATIONNAME"
+				jdbcType="VARCHAR" />
+		</association>
+		<association property="earlyWarning" javaType="com.ssm.wssmb.model.EarlyWarning">
+			<result property="id" column="earId" jdbcType="DECIMAL" />
+			<result property="occurtime" column="occurtime" jdbcType="TIMESTAMP" />
+			<result property="processtime" column="processtime" jdbcType="TIMESTAMP" />
+		</association>
+	</resultMap>
+
+	<select id="selectList" resultMap="BaseResultMap">
+		SELECT
+		a.*,b.concentratorName,c.ORGANIZATIONNAME,d.MeasureName
+		FROM
+		mb_terminal a,mb_concentrator b,sys_organization c,mb_measurefile d
+		WHERE a.concentratorId=b.concentratorId AND
+		a.organizationId=c.ORGANIZATIONID and a.measureId=d.MeasureId and
+		IS_PARENT_ORGANIZATION(a.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		order by terminalId ASC
+	</select>
+
+	<select id="organizationClickTreeList" resultMap="BaseResultMap">
+		SELECT
+		a.*,b.concentratorName,c.ORGANIZATIONNAME,d.MeasureName
+		FROM
+		mb_terminal a,mb_concentrator b,sys_organization c,mb_measurefile d
+		WHERE a.concentratorId=b.concentratorId AND
+		a.organizationId=c.ORGANIZATIONID and a.measureId=d.MeasureId and
+		IS_PARENT_ORGANIZATION(a.OrganizationId,#{id,jdbcType=INTEGER})=1
+		<if test="name != null and name != ''">
+			and a.terminalName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by terminalId ASC
+	</select>
+
+	<select id="regionClickTreeList" resultMap="BaseResultMap">
+		SELECT gg.id as reig,
+		a.*,b.concentratorName,c.ORGANIZATIONNAME,d.MeasureName
+		FROM
+		mb_terminal a,mb_concentrator b,sys_organization c,mb_measurefile
+		d,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		a.concentratorId=b.concentratorId AND
+		a.organizationId=c.ORGANIZATIONID and a.measureId=d.MeasureId
+		AND a.Region=gg.id
+		<if test="name != null and name != ''">
+			and a.terminalName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by terminalId ASC
+	</select>
+	
+	<select id="getTerminalAndNameByMeasureId" resultMap="BaseResultMap">
+		SELECT 
+		a.*,b.concentratorName,c.ORGANIZATIONNAME,d.MeasureName
+		FROM
+		mb_terminal a,mb_concentrator b,sys_organization c,mb_measurefile
+		d
+		WHERE
+		a.concentratorId=b.concentratorId AND
+		a.organizationId=c.ORGANIZATIONID and a.measureId=d.MeasureId
+		and a.measureId=#{measureId,jdbcType=INTEGER}
+		<if test="name != null and name != ''">
+			and a.terminalName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+	
+	<select id="getTerminalAndNameByConcentratorId" resultMap="BaseResultMap">
+		SELECT 
+		a.*,b.concentratorName,c.ORGANIZATIONNAME,d.MeasureName
+		FROM
+		mb_terminal a,mb_concentrator b,sys_organization c,mb_measurefile
+		d
+		WHERE
+		a.concentratorId=b.concentratorId AND
+		a.organizationId=c.ORGANIZATIONID and a.measureId=d.MeasureId
+		and a.concentratorId=#{id,jdbcType=INTEGER}
+		<if test="name != null and name != ''">
+			and a.terminalName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+	
+	<select id="getTerminalAndNameByTerminalIds" resultMap="BaseResultMap">
+		SELECT 
+		a.*,b.concentratorName,c.ORGANIZATIONNAME,d.MeasureName
+		FROM
+		mb_terminal a,mb_concentrator b,sys_organization c,mb_measurefile
+		d
+		WHERE
+		a.concentratorId=b.concentratorId AND
+		a.organizationId=c.ORGANIZATIONID and a.measureId=d.MeasureId
+		and a.terminalId=#{id,jdbcType=INTEGER}
+		<if test="name != null and name != ''">
+			and a.terminalName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+	
+	<select id="getTerminalAndNameByTerminalId" resultMap="BaseResultMap">
+		SELECT 
+		a.*,b.concentratorName,c.ORGANIZATIONNAME,d.MeasureName
+		FROM
+		mb_terminal a,mb_concentrator b,sys_organization c,mb_measurefile
+		d
+		WHERE
+		a.concentratorId=b.concentratorId AND
+		a.organizationId=c.ORGANIZATIONID and a.measureId=d.MeasureId
+		and a.terminalId=#{id,jdbcType=INTEGER}
+	</select>
+
+	<insert id="insert" parameterType="com.ssm.wssmb.model.Terminal">
+		insert into mb_terminal
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="terminalName != null">
+				terminalName,
+			</if>
+			<if test="address != null">
+				address,
+			</if>
+			<if test="installationLocation != null">
+				installationLocation,
+			</if>
+			<if test="concentratorId != null">
+				concentratorId,
+			</if>
+			<if test="organizationId != null">
+				organizationId,
+			</if>
+			<if test="region != null">
+				region,
+			</if>
+			<if test="manufacturer != null">
+				manufacturer,
+			</if>
+			<if test="produceDate != null">
+				produceDate,
+			</if>
+			<if test="creater != null">
+				creater,
+			</if>
+			<if test="createDate != null">
+				createDate,
+			</if>
+			<if test="measureId != null">
+				measureId,
+			</if>
+			<if test="terminalType != null">
+				terminalType,
+			</if>
+			<if test="softType != null">
+				softType,
+			</if>
+			<if test="hardType != null">
+				hardType,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="terminalName != null">
+				#{terminalName,jdbcType=VARCHAR},
+			</if>
+			<if test="address != null">
+				#{address,jdbcType=VARCHAR},
+			</if>
+			<if test="installationLocation != null">
+				#{installationLocation,jdbcType=VARCHAR},
+			</if>
+			<if test="concentratorId != null">
+				#{concentratorId,jdbcType=INTEGER},
+			</if>
+			<if test="organizationId != null">
+				#{organizationId,jdbcType=INTEGER},
+			</if>
+			<if test="region != null">
+				#{region,jdbcType=INTEGER},
+			</if>
+			<if test="manufacturer != null">
+				#{manufacturer,jdbcType=VARCHAR},
+			</if>
+			<if test="produceDate != null">
+				#{produceDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="creater != null">
+				#{creater,jdbcType=VARCHAR},
+			</if>
+			<if test="createDate != null">
+				#{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="measureId != null">
+				#{measureId,jdbcType=INTEGER},
+			</if>
+			<if test="createDate != null">
+				#{terminalType,jdbcType=INTEGER},
+			</if>
+			<if test="softType != null">
+				#{softType,jdbcType=VARCHAR},
+			</if>
+			<if test="hardType != null">
+				#{hardType,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="com.ssm.wssmb.model.Terminal">
+		update mb_terminal
+		<set>
+			<if test="terminalName != null">
+				terminalName=#{terminalName,jdbcType=VARCHAR},
+			</if>
+			<if test="address != null">
+				address=#{address,jdbcType=VARCHAR},
+			</if>
+			<if test="installationLocation != null">
+				installationLocation=#{installationLocation,jdbcType=VARCHAR},
+			</if>
+			<if test="concentratorId != null">
+				concentratorId= #{concentratorId,jdbcType=INTEGER},
+			</if>
+			<if test="organizationId != null">
+				organizationId=#{organizationId,jdbcType=INTEGER},
+			</if>
+			<if test="region != null">
+				region=#{region,jdbcType=INTEGER},
+			</if>
+			<if test="manufacturer != null">
+				manufacturer=#{manufacturer,jdbcType=VARCHAR},
+			</if>
+			<if test="produceDate != null">
+				produceDate=#{produceDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="creater != null">
+				creater=#{creater,jdbcType=VARCHAR},
+			</if>
+			<if test="createDate != null">
+				createDate=#{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="measureId != null">
+				measureId=#{measureId,jdbcType=INTEGER},
+			</if>
+			<if test="createDate != null">
+				terminalType=#{terminalType,jdbcType=INTEGER},
+			</if>
+			<if test="softType != null">
+				softType=#{softType,jdbcType=VARCHAR},
+			</if>
+			<if test="hardType != null">
+				hardType=#{hardType,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where terminalId = #{terminalId,jdbcType=INTEGER}
+	</update>
+
+	<delete id="delete" parameterType="com.ssm.wssmb.model.Terminal">
+		delete from mb_terminal
+		where
+		terminalId = #{terminalId,jdbcType=INTEGER}
+	</delete>
+
+	<select id="searchInf" resultMap="BaseResultMap">
+		SELECT a.*,b.concentratorName,c.ORGANIZATIONNAME,d.MeasureName
+		FROM
+		mb_terminal a,mb_concentrator b,sys_organization c,mb_measurefile d
+		WHERE a.concentratorId=b.concentratorId AND
+		a.organizationId=c.ORGANIZATIONID and a.measureId=d.MeasureId and
+		IS_PARENT_ORGANIZATION(a.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		<if test=" terminalName != null and terminalName !=''">
+			and terminalName like CONCAT(CONCAT('%',
+			#{terminalName,jdbcType=VARCHAR}), '%')
+		</if>
+		<if test=" address != null and address !=''">
+			and a.address like CONCAT(CONCAT('%',
+			#{address,jdbcType=VARCHAR}), '%')
+		</if>
+		order by terminalId asc
+		limit #{startindex,jdbcType=INTEGER} ,
+		#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getTerminalCount" resultType="Integer">
+		SELECT count(0)
+		FROM mb_terminal a,mb_concentrator b,sys_organization
+		c,mb_measurefile d
+		WHERE a.concentratorId=b.concentratorId AND
+		a.organizationId=c.ORGANIZATIONID and a.measureId=d.MeasureId
+		<if test=" terminalName != null and terminalName !=''">
+			and terminalName like CONCAT(CONCAT('%',
+			#{terminalName,jdbcType=VARCHAR}), '%')
+		</if>
+		<if test=" address != null and address !=''">
+			and a.address like CONCAT(CONCAT('%',
+			#{address,jdbcType=VARCHAR}), '%')
+		</if>
+	</select>
+
+	<select id="selectCount" resultType="java.lang.Integer">
+		select
+		count(0)
+		from
+		mb_terminal where terminalId = #{terminalId,jdbcType=INTEGER}
+	</select>
+
+	<select id="getTerminalWarnByMeasureId" resultMap="BaseResultMap">
+		SELECT
+		mt.*,be.id earId, be.processTime, be.occurTime
+		FROM
+		mb_terminal mt,
+		bus_earlywarning be
+		WHERE
+		mt.address = (
+		SELECT
+		equipmentAddress
+		FROM
+		bus_earlywarning
+		WHERE
+		measureAddress IN (
+		SELECT
+		MeasureNumber
+		FROM
+		mb_measurefile
+		WHERE
+		MeasureId = #{measureId,jdbcType=DECIMAL}
+		)
+		AND
+		ISNULL(endTime)
+		)
+		AND ISNULL(endTime)
+	</select>
+
+	<select id="getTerminalFaultByMeasureId" resultMap="BaseResultMap">
+		SELECT
+		mt.*,be.id earId, be.processTime, be.occurTime
+		FROM
+		mb_terminal mt,
+		bus_fault be
+		WHERE
+		mt.address = (
+		SELECT
+		equipmentAddress
+		FROM
+		bus_fault
+		WHERE
+		measureAddress IN (
+		SELECT
+		MeasureNumber
+		FROM
+		mb_measurefile
+		WHERE
+		MeasureId = #{measureId,jdbcType=DECIMAL}
+		)
+		AND ISNULL(endTime)
+		)
+		AND
+		ISNULL(endTime)
+	</select>
+
+	<select id="getTerminalMessageByMeasureId" resultMap="BaseResultMap">
+		SELECT
+		mt.*,be.id earId, be.occurTime
+		FROM
+		mb_terminal mt,
+		bus_messagepushrecord be
+		WHERE
+		mt.address IN (
+		SELECT
+		equipmentAddress
+		FROM
+		bus_messagepushrecord
+		WHERE
+		measureAddress IN (
+		SELECT
+		MeasureNumber
+		FROM
+		mb_measurefile
+		WHERE
+		MeasureId =#{measureId,jdbcType=DECIMAL}
+		)
+		)
+	</select>
+
+	<select id="getTerminalCountByMeasureId" resultType="java.lang.Integer">
+		select
+		count(0)
+		from
+		mb_terminal where measureId =
+		#{measureId,jdbcType=INTEGER}
+	</select>
+
+	<select id="getTerminalListByIDs" resultMap="BaseResultMap">
+		select e.*
+		from mb_terminal e
+		where e.terminalId in
+		<foreach collection="ids" item="item" index="index" open="("
+			close=")" separator=",">
+			#{item,jdbcType=INTEGER}
+		</foreach>
+		order by e.terminalId
+	</select>
+
+	<select id="getAllAddress" resultType="java.lang.String">
+		select address from mb_terminal
+	</select>
+
+	<select id="selectByAddress" resultMap="BaseResultMap">
+		select * from mb_terminal
+		where address=#{address,jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectByIdAndType" resultMap="BaseResultMap">
+		select t.* from mb_terminal t
+		where t.terminalId=#{equipmentid,jdbcType=INTEGER} 
+	</select>
+
+	<select id="getTerminalByMeasureId" resultMap="BaseResultMap">
+		SELECT
+		mt.*
+		FROM
+		mb_terminal mt
+		where mt.MeasureId = #{measureId,jdbcType=DECIMAL}
+	</select>
+	
+	<select id="queryTerminalByAddress" resultMap="BaseResultMap">
+        select * from mb_terminal where address=#{address,jdbcType=VARCHAR}
+    </select>
+</mapper>

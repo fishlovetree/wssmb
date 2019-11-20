@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.CommonTreeMapper">
+	<resultMap id="BaseResultMap" type="com.ssm.wssmb.model.TreeNode">
+		<result column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="GID" property="gid" jdbcType="DECIMAL" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="TEXT" property="text" jdbcType="VARCHAR" />
+		<result column="TYPE" property="type" jdbcType="DECIMAL" />
+		<result column="PARENTTYPE" property="parenttype" jdbcType="DECIMAL" />
+		<result column="PARENTID" property="parentid" jdbcType="VARCHAR" />
+		<result column="STATE" property="state" jdbcType="VARCHAR" />
+		<result column="ICONCLS" property="iconCls" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="getOrganizationidByorganizationcode" resultType="String">
+		select organizationid from sys_organization
+		where organizationcode=#{organizationcode,jdbcType=VARCHAR}
+	</select>
+	<!-- 根据权限获取组织机构 -->
+	<select id="selectOrganization" resultMap="BaseResultMap">
+		select concat('organization' , o.organizationid) as id,
+		o.organizationid as gid, o.ORGANIZATIONCODE as name,
+		o.ORGANIZATIONNAME as text, concat('organization' , o.PARENTID) as
+		parentid, 1 as type, -1 as parenttype,
+		'icon-organization' as iconcls from sys_organization o where o.status = 1
+		<if test="organizationid != null and organizationid !=''">
+			and
+			FIND_IN_SET(o.organizationid,getChildList_sys_organization(#{organizationid,jdbcType=VARCHAR}))
+			&gt; 0
+		</if>
+		order by o.organizationid
+	</select>
+
+	<!-- 根据组织机构获取表箱 -->
+	<select id="selectMeasureFile" resultMap="BaseResultMap">
+		SELECT CONCAT('measure' , o.MeasureId) AS id, o.MeasureId AS gid,
+		o.MeasureNumber AS NAME,
+		o.MeasureName AS TEXT, CONCAT('organization' , o.organizationid) AS parentid, 3 as
+		type, -1 as parenttype,
+		'icon-customer' AS iconcls FROM mb_measurefile o where 1=1
+		<if test="organizationid != null and organizationid !=''">
+			and
+			FIND_IN_SET(o.organizationid,getChildList_sys_organization(#{organizationid,jdbcType=VARCHAR}))
+			&gt; 0
+		</if>
+		order by o.organizationid
+	</select>
+
+	<!-- 根据权限获取区域 -->
+	<select id="selectRegion" resultMap="BaseResultMap">
+		select concat('region' , a.id) as id, a.id as gid, a.name as name, a.name as text,
+		concat('region' , a.parentid) as parentid, 2 as type, -1 as parenttype, 'icon-region' as iconcls from sys_area a 
+		where FIND_IN_SET(a.id, (select GROUP_CONCAT(distinct concat_ws(',', r.id, r.pid, r.p2id, r.p3id, r.p4id)) from mb_measurefile m 
+        left join view_regiontree r on r.id = m.region
+        where 1=1
+        <if test="organizationid != null and organizationid !=''">
+			and
+			FIND_IN_SET(m.organizationid,getChildList_sys_organization(#{organizationid,jdbcType=VARCHAR}))
+			&gt; 0
+		</if>
+        )) &gt; 0
+	</select>
+
+	<!-- 根据权限获取表箱 -->
+	<select id="selectRegionMeasureFile" resultMap="BaseResultMap">
+		SELECT CONCAT('measure' , o.MeasureId) AS id, o.MeasureId AS gid,
+		o.MeasureNumber AS NAME,
+		o.MeasureName AS TEXT, CONCAT('region' , o.Region) AS parentid, 3 as type, -1 as
+		parenttype,
+		'icon-home' AS iconcls FROM mb_measurefile o WHERE 1=1
+		<if test="organizationid != null and organizationid !=''">
+			and
+			FIND_IN_SET(o.organizationid,getChildList_sys_organization(#{organizationid,jdbcType=VARCHAR}))
+			&gt; 0
+		</if>
+		ORDER BY o.organizationid
+	</select>
+
+
+	<!-- 根据权限获取集中器 -->
+	<select id="selectConcentrator" resultMap="BaseResultMap">
+		SELECT CONCAT('concentrator' , u.concentratorId) AS id,
+		u.concentratorId AS gid, u.address AS NAME, u.concentratorName AS
+		TEXT,
+		CONCAT('measure' , u.measureId) AS parentid, 4 as type, -1 as parenttype,
+		'icon-unit' AS iconcls FROM mb_concentrator u
+		WHERE 1=1
+		<if test="organizationid != null and organizationid !=''">
+			and
+			FIND_IN_SET(u.organizationid,getChildList_sys_organization(#{organizationid,jdbcType=VARCHAR}))
+			&gt; 0
+		</if>
+	</select>
+
+
+	<!-- 根据权限获取消防监测终端 -->
+	<select id="selectTerminal" resultMap="BaseResultMap">
+		select concat('terminal' , u.terminalId) as id, u.terminalId as gid,
+		u.address as name, u.terminalName as text,
+		concat('concentrator' , u.concentratorId) as parentid,5 as type, -1 as parenttype,
+		'icon-equipment' as iconcls from mb_terminal u
+		where 1= 1
+		<if test="organizationid != null and organizationid !=''">
+			and
+			FIND_IN_SET(u.organizationid,getChildList_sys_organization(#{organizationid,jdbcType=VARCHAR}))
+			&gt; 0
+		</if>
+		order by u.concentratorId
+	</select>
+
+	<!-- 根据权限获取电表 -->
+	<select id="selectAmmeter" resultMap="BaseResultMap">
+		select concat('ammeterName' , u.id) as id, u.id as gid, u.ammeterCode
+		as name, u.ammeterName as text,
+		concat('concentrator' , u.concentratorCode) as parentid,6 as type, -1 as parenttype,
+		'icon-device' as iconcls from mb_ammeter u
+		where 1= 1
+		<if test="organizationid != null and organizationid !=''">
+			and FIND_IN_SET(u.organizationcode,getChildList_sys_organization(#{organizationid,jdbcType=VARCHAR})) &gt; 0
+		</if>
+		order by u.concentratorCode
+	</select>
+
+
+	<!-- 树节点收起配置 -->
+	<resultMap id="SettingMap" type="com.ssm.wssmb.model.TreeSetting">
+		<result column="CODE" property="code" jdbcType="VARCHAR" />
+		<result column="NODEID" property="nodeid" jdbcType="VARCHAR" />
+		<result column="TREETYPE" property="treetype" jdbcType="DECIMAL" />
+	</resultMap>
+	<!-- 根据组织机构代码获取收起节点集合 -->
+	<select id="selectSettingNodes" resultMap="SettingMap">
+		select code, nodeid, treetype from bus_treesetting
+		where code = #{code,jdbcType=VARCHAR}
+	</select>
+	<delete id="deleteSettingNodes">
+		delete from bus_treesetting where code = #{code,jdbcType=VARCHAR}
+	</delete>
+	<insert id="insertSettingNodes" useGeneratedKeys="false">
+		insert into bus_treesetting (code, nodeid, treetype)
+		<foreach collection="nodes" index="index" item="item"
+			separator="union all">
+			(
+			SELECT
+			#{code,jdbcType=VARCHAR} CODE,
+			#{item.nodeid,jdbcType=VARCHAR} NODEID,
+			#{item.treetype,jdbcType=DECIMAL} TREETYPE
+			FROM dual
+			)
+		</foreach>
+	</insert>
+</mapper>

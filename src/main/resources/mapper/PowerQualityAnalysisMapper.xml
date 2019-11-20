@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.PowerQualityAnalysisMapper">
+	<resultMap id="BaseResultMap"
+		type="com.ssm.wssmb.model.PowerQualityAnalysis">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="equipmentAddress" property="equipmentAddress"
+			jdbcType="VARCHAR" />
+		<result column="measureAddress" property="measureAddress"
+			jdbcType="VARCHAR" />
+		<result column="voltageHarmonic" property="voltageHarmonic"
+			jdbcType="VARCHAR" />
+		<result column="currentHarmonics" property="currentHarmonics"
+			jdbcType="VARCHAR" />
+		<result column="incident" property="incident"
+			jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="equipId" property="equipId" jdbcType="INTEGER" />
+		<result column="occurTime" property="occurTime"
+			jdbcType="TIMESTAMP" />
+		<result column="insertionTime" property="insertionTime"
+			jdbcType="TIMESTAMP" />
+		<result column="equipmentName" property="equipmentName"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectTerminalAnalysis" resultMap="BaseResultMap">
+	select p.*,t.terminalName as equipmentName from bus_powerqualityanalysis p,mb_terminal t
+	where p.equipId=t.terminalId and p.type=#{type,jdbcType=VARCHAR} and p.equipId=#{id,jdbcType=INTEGER}
+	and IS_PARENT_ORGANIZATION(t.organizationId,#{organizationid,jdbcType=INTEGER})=1
+	<if test="startdate !=null and startdate !=''">
+		and p.insertionTime &gt; date_format(#{startdate,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="enddate !=null and enddate !=''">
+		and p.insertionTime &lt; date_format(#{enddate,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+		</if>
+		limit #{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+	
+	<select id="selectTerminalAnalysisCount" resultType="Integer">
+	select count(0) from bus_powerqualityanalysis p,mb_terminal t
+	where p.equipId=t.terminalId and p.type=#{type,jdbcType=VARCHAR} and p.equipId=#{id,jdbcType=INTEGER}
+	and IS_PARENT_ORGANIZATION(t.organizationId,#{organizationid,jdbcType=INTEGER})=1
+	<if test="startdate !=null and startdate !=''">
+		and p.insertionTime &gt; date_format(#{startdate,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="enddate !=null and enddate !=''">
+		and p.insertionTime &lt; date_format(#{enddate,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+		</if>
+	</select>
+	
+	<select id="selectAmmeterAnalysis" resultMap="BaseResultMap">
+	select p.*,t.ammeterName as equipmentName from bus_powerqualityanalysis p,mb_ammeter t
+	where p.equipId=t.id and p.type=#{type,jdbcType=VARCHAR} and p.equipId=#{id,jdbcType=INTEGER}
+	and IS_PARENT_ORGANIZATION(t.organizationCode,#{organizationid,jdbcType=INTEGER})=1
+	<if test="startdate !=null and startdate !=''">
+		and p.insertionTime &gt; date_format(#{startdate,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="enddate !=null and enddate !=''">
+		and p.insertionTime &lt; date_format(#{enddate,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+		</if>
+		limit #{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>	
+	
+	<select id="selectAmmeterAnalysisCount" resultType="Integer">
+	select count(0) from bus_powerqualityanalysis p,mb_ammeter t
+	where p.equipId=t.id and p.type=#{type,jdbcType=VARCHAR} and p.equipId=#{id,jdbcType=INTEGER}
+	and IS_PARENT_ORGANIZATION(t.organizationCode,#{organizationid,jdbcType=INTEGER})=1
+	<if test="startdate !=null and startdate !=''">
+		and p.insertionTime &gt; date_format(#{startdate,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="enddate !=null and enddate !=''">
+		and p.insertionTime &lt; date_format(#{enddate,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+		</if>
+	</select>
+
+</mapper>

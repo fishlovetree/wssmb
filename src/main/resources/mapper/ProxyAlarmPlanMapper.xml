@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.ProxyAlarmPlanMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.ProxyAlarmPlan" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="PROXYID" property="proxyid" jdbcType="DECIMAL" />
+    <result column="ALMENATHRESHOLD" property="almenathreshold" jdbcType="DECIMAL" />
+    <result column="MANDATARY" property="mandatary" jdbcType="DECIMAL" />
+    <result column="FEPCONFIG" property="fepconfig" jdbcType="DECIMAL" />
+    <result column="DIALERCONFIG" property="dialerconfig" jdbcType="DECIMAL" />
+    <result column="DIALERNUM" property="dialernum" jdbcType="DECIMAL" />
+    <result column="DIALERMODEL" property="dialermodel" jdbcType="VARCHAR" />
+    <result column="SOUNDCONTENT" property="soundcontent" jdbcType="VARCHAR" />
+    <result column="SOUNDPLAYTIME" property="soundplaytime" jdbcType="DECIMAL" />
+    <result column="DIALMODE" property="dialmode" jdbcType="DECIMAL" />
+    <result column="SMSCONFIG" property="smsconfig" jdbcType="DECIMAL" />
+    <result column="SMSNUM" property="smsnum" jdbcType="DECIMAL" />
+    <result column="SMSMODEL" property="smsmodel" jdbcType="VARCHAR" />
+    <result column="SMSCONTENT" property="smscontent" jdbcType="VARCHAR" />
+    <result column="SMSMODE" property="smsmode" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="COMPACTOR" property="compactor" jdbcType="DECIMAL" />
+    <result column="COMPILATIONTIME" property="compilationtime" jdbcType="TIMESTAMP" />
+    <result column="ORGANIZATIONNAME" property="organizationname" jdbcType="VARCHAR" />
+    <result column="ORGANIZATIONCODE" property="organizationcode" jdbcType="VARCHAR" />
+    <result column="USERNAME" property="username" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="EventResultMap" type="com.ssm.wssmb.model.ProxyAlarmPlanEvent" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="PLANID" property="planid" jdbcType="DECIMAL" />
+    <result column="EVENTID" property="eventid" jdbcType="DECIMAL" />
+    <result column="EVENTNAME" property="eventname" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, PROXYID, ALMENATHRESHOLD, MANDATARY, FEPCONFIG, DIALERCONFIG, DIALERNUM, DIALERMODEL, 
+    SOUNDCONTENT, SOUNDPLAYTIME, DIALMODE, SMSCONFIG, SMSNUM, SMSMODEL, SMSCONTENT, SMSMODE, 
+    STATUS, COMPACTOR, COMPILATIONTIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from BUS_PROXYALARMPLAN
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from BUS_PROXYALARMPLAN
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.ProxyAlarmPlan" >
+    insert into BUS_PROXYALARMPLAN (ID, PROXYID, ALMENATHRESHOLD, 
+      MANDATARY, FEPCONFIG, DIALERCONFIG, 
+      DIALERNUM, DIALERMODEL, SOUNDCONTENT, 
+      SOUNDPLAYTIME, DIALMODE, SMSCONFIG, 
+      SMSNUM, SMSMODEL, SMSCONTENT, 
+      SMSMODE, STATUS, COMPACTOR, 
+      COMPILATIONTIME)
+    values (#{id,jdbcType=DECIMAL}, #{proxyid,jdbcType=DECIMAL}, #{almenathreshold,jdbcType=DECIMAL}, 
+      #{mandatary,jdbcType=DECIMAL}, #{fepconfig,jdbcType=DECIMAL}, #{dialerconfig,jdbcType=DECIMAL}, 
+      #{dialernum,jdbcType=DECIMAL}, #{dialermodel,jdbcType=VARCHAR}, #{soundcontent,jdbcType=VARCHAR}, 
+      #{soundplaytime,jdbcType=DECIMAL}, #{dialmode,jdbcType=DECIMAL}, #{smsconfig,jdbcType=DECIMAL}, 
+      #{smsnum,jdbcType=DECIMAL}, #{smsmodel,jdbcType=VARCHAR}, #{smscontent,jdbcType=VARCHAR}, 
+      #{smsmode,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, #{compactor,jdbcType=DECIMAL}, 
+      #{compilationtime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.ProxyAlarmPlan" >
+    insert into BUS_PROXYALARMPLAN
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="proxyid != null" >
+        PROXYID,
+      </if>
+      <if test="almenathreshold != null" >
+        ALMENATHRESHOLD,
+      </if>
+      <if test="mandatary != null" >
+        MANDATARY,
+      </if>
+      <if test="fepconfig != null" >
+        FEPCONFIG,
+      </if>
+      <if test="dialerconfig != null" >
+        DIALERCONFIG,
+      </if>
+      <if test="dialernum != null" >
+        DIALERNUM,
+      </if>
+      <if test="dialermodel != null" >
+        DIALERMODEL,
+      </if>
+      <if test="soundcontent != null" >
+        SOUNDCONTENT,
+      </if>
+      <if test="soundplaytime != null" >
+        SOUNDPLAYTIME,
+      </if>
+      <if test="dialmode != null" >
+        DIALMODE,
+      </if>
+      <if test="smsconfig != null" >
+        SMSCONFIG,
+      </if>
+      <if test="smsnum != null" >
+        SMSNUM,
+      </if>
+      <if test="smsmodel != null" >
+        SMSMODEL,
+      </if>
+      <if test="smscontent != null" >
+        SMSCONTENT,
+      </if>
+      <if test="smsmode != null" >
+        SMSMODE,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="compactor != null" >
+        COMPACTOR,
+      </if>
+      <if test="compilationtime != null" >
+        COMPILATIONTIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="proxyid != null" >
+        #{proxyid,jdbcType=DECIMAL},
+      </if>
+      <if test="almenathreshold != null" >
+        #{almenathreshold,jdbcType=DECIMAL},
+      </if>
+      <if test="mandatary != null" >
+        #{mandatary,jdbcType=DECIMAL},
+      </if>
+      <if test="fepconfig != null" >
+        #{fepconfig,jdbcType=DECIMAL},
+      </if>
+      <if test="dialerconfig != null" >
+        #{dialerconfig,jdbcType=DECIMAL},
+      </if>
+      <if test="dialernum != null" >
+        #{dialernum,jdbcType=DECIMAL},
+      </if>
+      <if test="dialermodel != null" >
+        #{dialermodel,jdbcType=VARCHAR},
+      </if>
+      <if test="soundcontent != null" >
+        #{soundcontent,jdbcType=VARCHAR},
+      </if>
+      <if test="soundplaytime != null" >
+        #{soundplaytime,jdbcType=DECIMAL},
+      </if>
+      <if test="dialmode != null" >
+        #{dialmode,jdbcType=DECIMAL},
+      </if>
+      <if test="smsconfig != null" >
+        #{smsconfig,jdbcType=DECIMAL},
+      </if>
+      <if test="smsnum != null" >
+        #{smsnum,jdbcType=DECIMAL},
+      </if>
+      <if test="smsmodel != null" >
+        #{smsmodel,jdbcType=VARCHAR},
+      </if>
+      <if test="smscontent != null" >
+        #{smscontent,jdbcType=VARCHAR},
+      </if>
+      <if test="smsmode != null" >
+        #{smsmode,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="compactor != null" >
+        #{compactor,jdbcType=DECIMAL},
+      </if>
+      <if test="compilationtime != null" >
+        #{compilationtime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.ProxyAlarmPlan" >
+    update BUS_PROXYALARMPLAN
+    <set >
+      <if test="proxyid != null" >
+        PROXYID = #{proxyid,jdbcType=DECIMAL},
+      </if>
+      <if test="almenathreshold != null" >
+        ALMENATHRESHOLD = #{almenathreshold,jdbcType=DECIMAL},
+      </if>
+      <if test="mandatary != null" >
+        MANDATARY = #{mandatary,jdbcType=DECIMAL},
+      </if>
+      <if test="fepconfig != null" >
+        FEPCONFIG = #{fepconfig,jdbcType=DECIMAL},
+      </if>
+      <if test="dialerconfig != null" >
+        DIALERCONFIG = #{dialerconfig,jdbcType=DECIMAL},
+      </if>
+      <if test="dialernum != null" >
+        DIALERNUM = #{dialernum,jdbcType=DECIMAL},
+      </if>
+      <if test="dialermodel != null" >
+        DIALERMODEL = #{dialermodel,jdbcType=VARCHAR},
+      </if>
+      <if test="soundcontent != null" >
+        SOUNDCONTENT = #{soundcontent,jdbcType=VARCHAR},
+      </if>
+      <if test="soundplaytime != null" >
+        SOUNDPLAYTIME = #{soundplaytime,jdbcType=DECIMAL},
+      </if>
+      <if test="dialmode != null" >
+        DIALMODE = #{dialmode,jdbcType=DECIMAL},
+      </if>
+      <if test="smsconfig != null" >
+        SMSCONFIG = #{smsconfig,jdbcType=DECIMAL},
+      </if>
+      <if test="smsnum != null" >
+        SMSNUM = #{smsnum,jdbcType=DECIMAL},
+      </if>
+      <if test="smsmodel != null" >
+        SMSMODEL = #{smsmodel,jdbcType=VARCHAR},
+      </if>
+      <if test="smscontent != null" >
+        SMSCONTENT = #{smscontent,jdbcType=VARCHAR},
+      </if>
+      <if test="smsmode != null" >
+        SMSMODE = #{smsmode,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="compactor != null" >
+        COMPACTOR = #{compactor,jdbcType=DECIMAL},
+      </if>
+      <if test="compilationtime != null" >
+        COMPILATIONTIME = #{compilationtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.ProxyAlarmPlan" >
+    update BUS_PROXYALARMPLAN
+    set PROXYID = #{proxyid,jdbcType=DECIMAL},
+      ALMENATHRESHOLD = #{almenathreshold,jdbcType=DECIMAL},
+      MANDATARY = #{mandatary,jdbcType=DECIMAL},
+      FEPCONFIG = #{fepconfig,jdbcType=DECIMAL},
+      DIALERCONFIG = #{dialerconfig,jdbcType=DECIMAL},
+      DIALERNUM = #{dialernum,jdbcType=DECIMAL},
+      DIALERMODEL = #{dialermodel,jdbcType=VARCHAR},
+      SOUNDCONTENT = #{soundcontent,jdbcType=VARCHAR},
+      SOUNDPLAYTIME = #{soundplaytime,jdbcType=DECIMAL},
+      DIALMODE = #{dialmode,jdbcType=DECIMAL},
+      SMSCONFIG = #{smsconfig,jdbcType=DECIMAL},
+      SMSNUM = #{smsnum,jdbcType=DECIMAL},
+      SMSMODEL = #{smsmodel,jdbcType=VARCHAR},
+      SMSCONTENT = #{smscontent,jdbcType=VARCHAR},
+      SMSMODE = #{smsmode,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=DECIMAL},
+      COMPACTOR = #{compactor,jdbcType=DECIMAL},
+      COMPILATIONTIME = #{compilationtime,jdbcType=TIMESTAMP}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <select id="selectSchemeList" resultMap="BaseResultMap">
+    select r.*,o.organizationname, o.organizationcode,u.username
+    from BUS_PROXYALARMPLAN r
+    left join sys_organization o on o.organizationid = r.proxyid
+    left join SYS_USER u on u.id = r.compactor
+    where r.PLANTYPE = #{plantype,jdbcType=DECIMAL} and r.STATUS = 1
+    <if test="organizationid != null and organizationid != 0" >
+      AND r.proxyid IN(SELECT organizationid FROM sys_organization
+    WHERE IS_PARENT_ORGANIZATION(organizationid,#{organizationid,jdbcType=INTEGER})=1)
+       
+    </if>
+  </select>
+  <select id="selectEventList" resultMap="EventResultMap">
+    select e.*, m.detailname as eventname
+    from BUS_PROXYALARMPLANEVENT e
+    left join BUS_PROXYALARMPLAN r on r.id = e.planid
+    left join sys_constantdetail m on m.coding = '1011' and m.detailvalue = e.eventid
+    where e.planid = #{planid,jdbcType=DECIMAL}
+    order by e.id
+  </select>
+  <delete id="deleteAlarmEvent" parameterType="java.lang.Integer">
+    delete from BUS_PROXYALARMPLANEVENT
+    where planid = #{planid,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insertAlarmEvent" useGeneratedKeys="false">
+     insert into BUS_PROXYALARMPLANEVENT (PLANID, EVENTID) 
+     <foreach collection="events" index="index" item="item" separator="union all">
+     (
+	   SELECT 
+	   #{item.planid,jdbcType=DECIMAL} PLANID,
+	   #{item.eventid,jdbcType=DECIMAL} EVENTID
+	   FROM dual
+     )
+     </foreach>
+  </insert>
+  <!-- 委托 -->
+  <update id="entrust">
+    update BUS_PROXYALARMPLAN set mandatary = 1 where id = #{id,jdbcType=DECIMAL}
+  </update>
+  <!-- 取消委托 -->
+  <update id="unentrust">
+    update BUS_PROXYALARMPLAN set mandatary = 0 where id = #{id,jdbcType=DECIMAL}
+  </update>
+  <select id="selectByProxyid" resultMap="BaseResultMap">
+    select r.*,o.organizationname, o.organizationcode,u.username
+    from BUS_PROXYALARMPLAN r
+    left join sys_organization o on o.organizationid = r.proxyid
+    left join SYS_USER u on u.id = r.compactor
+    where r.PROXYID = #{organizationid,jdbcType=DECIMAL}
+  </select>
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.ConstantMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.Constant" >
+    <id column="CODING" property="coding" jdbcType="DECIMAL" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="ENNAME" property="enname" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    CODING, NAME, ENNAME, STATUS
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_CONSTANT
+    where CODING = #{coding,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    update SYS_CONSTANT
+    set STATUS = 0
+    where CODING = #{coding,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.Constant" >
+    insert into SYS_CONSTANT (NAME, ENNAME, 
+      STATUS)
+    values (#{name,jdbcType=VARCHAR}, #{enname,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.Constant" >
+    insert into SYS_CONSTANT
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="enname != null" >
+        ENNAME,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="enname != null" >
+        #{enname,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.Constant" >
+    update SYS_CONSTANT
+    <set >
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="enname != null" >
+        ENNAME = #{enname,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where CODING = #{coding,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.Constant" >
+    update SYS_CONSTANT
+    set NAME = #{name,jdbcType=VARCHAR},
+      ENNAME = #{enname,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL}
+    where CODING = #{coding,jdbcType=DECIMAL}
+  </update>
+  <select id="selectConstantList" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_CONSTANT
+    where STATUS = 1 order by CODING desc
+  </select>
+</mapper>

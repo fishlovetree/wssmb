@@ -1,0 +1,424 @@
+/*---	主容器样式 	---*/
+#wsContainer {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    position:relative;
+    overflow: hidden;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+/* ------鼠标右键样式开始-----*/
+ .wsContextmenu{
+ 	   display:none;
+       background-color: #fff;
+       position:absolute;
+       top: 0px;
+       left: 0px;
+       z-index: 101;
+       cursor:default;
+       box-shadow: -2px -2px 1px rgba(0,0,0,.3);
+       border:1px solid #ddd;
+   }
+.wsContextmenu ul{
+	list-style: none;
+	width: 70px;
+	padding:5px;
+	margin: 0px;
+	text-align: center;
+}
+.wsContextmenu ul li{
+    height: 30px;
+    line-height: 30px;
+    border-radius: 3px;
+}
+.wsContextmenu ul li:hover a{
+    text-decoration: underline;
+    cursor: pointer;
+}
+/* ------鼠标右键样式结束-----*/
+
+ /*--设置弹出框样式--*/
+ .popup {
+     position: absolute;
+     background-color: #eeeeee;
+     -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+     filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+     border-radius: 3px;
+     border: 1px solid #cccccc;
+     min-width: 270px;
+     max-width: 320px;
+     z-index:101;
+     top: 0px;
+      left: 0px;
+     display:none;
+ }
+ .popup:after, .popup:before {
+     top: 100%;
+     border: solid transparent;
+     content: " ";
+     height: 0;
+     width: 0;
+     position: absolute;
+     pointer-events: none;
+ }
+ .popup:after {
+     border-top-color: #eeeeee;
+     border-width: 10px;
+     left: 50%;
+     margin-left: -10px;
+ }
+ .popup:before {
+     border-top-color: #cccccc;
+     border-width: 11px;
+     left: 50%;
+     margin-left: -11px;
+ }
+ .pop-header{
+     width:100%;
+     height:30px;
+     border-radius: 3px 3px 0 0;
+     line-height: 26px;
+ }
+ .popup-title{
+     font:bold 15px sans-serif;
+     color: #fff;
+     margin-left: 10px;
+     line-height: 30px;
+ }
+ .popup-content{
+     max-height: 200px;
+     overflow-y: auto;
+     padding: 0px 20px 10px;
+ }
+ .popup-closer {
+     text-decoration: none;
+     position: absolute;
+     top: 2px;
+     right: 8px;
+     color:#fff !important;
+     font-size: 16px;
+ }
+ .popup-closer:after {
+     content: "✖";
+ }
+ /*设置弹出框表格中th、td的样式*/
+ .popupTable th,.popupTable td{
+     font-size: 12px;
+     line-height: 20px;
+     color: #4D4D4D;
+     font-weight: normal;
+     text-align: left;
+ }
+ .popupToolItem{
+ 	 text-decoration:underline;
+     font-size: 12px;
+     color:blue;
+     cursor:pointer;
+ }
+	    
+/*建筑树样式开始*/
+#buildingTreeContainer{
+	width:250px;
+	height:350px;
+ 	position:absolute;
+ 	left:0px;
+ 	top:50%;
+ 	z-index:101;
+ 	margin-top:-175px;
+	color: rgb(60, 60, 60);
+	border:1px solid #bbb;
+	background-color:#eee;
+	font-size:12px;
+}
+.buildingTreeHeader{
+	height:35px;
+ 	line-height: 35px;
+ 	font-size: 14px;
+ 	padding-left: 15px;
+ 	font-weight: bold;
+ 	border-bottom:1px solid #bbb;
+}
+.buildingTreeHeader a{
+    height: 22px;
+ 	width: 22px;
+ 	float: right;
+ 	margin: 8px;
+ 	background-image:url('../../images/gis/arrows.png');
+}
+.buildingTreeHeader a.collapse{				/*折叠状态*/
+	background-position: 0 -22px;
+}
+#buildingTree{
+	overflow: auto;
+ 	width: 250px;
+ 	height:310px;
+}
+/*建筑树样式结束*/
+
+
+/*右侧菜单按钮样式开始*/
+.rightMenuItem a{
+   display: block;
+   height: 40px;
+   width: 40px;
+   /* background-color:rgba(255, 131, 3, 0.9); */
+}
+.rightMenuItem a:hover i{
+   color:#ccc;
+}
+.rightMenuItem a:hover{
+   /* background-color:rgba(255, 131, 3, 0.8); */
+}
+.rightMenuItem a.selected{
+   /* background-color:rgba(255, 131, 3, 0.7); */
+}
+.rightMenuItem a i{
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+ 	margin: 10px;
+ 	color:#eee;
+ 	text-align: center;
+ 	font-size:18px;
+}
+.rightMenuItem.wsZoomIn{
+	margin-top:10px;
+}
+/*右侧菜单按钮样式结束*/
+
+/*搜索框样式开始*/
+#equipmentSearchbar{
+ 	position:absolute;
+    right:55px;
+    top:60px;
+    z-index:101;
+ 	width:250px;
+ 	height:350px;
+ 	color: rgb(60, 60, 60);
+ 	border:1px solid #bbb;
+ 	background-color:#eee;
+ 	font-size:12px;
+ 	display:none;
+ }
+ .searchbarHeader{
+ 	height:35px;
+    line-height: 35px;
+    font-size: 14px;
+    padding-left: 15px;
+    font-weight: bold;
+    border-bottom:1px solid #bbb;
+ }
+ #searchbtn {
+  	 position: absolute;
+     right: 10px;
+     top: 40px;
+     width: 25px;
+     height: 25px;
+     cursor: pointer;
+ }
+ #searchText {
+     box-sizing: border-box;
+     text-indent: 2px;
+     border: none;
+     width: 160px;
+     height: 20px;
+     margin:7px;
+     line-height: 20px;
+     padding: 0;
+     letter-spacing: .5px;
+     font-size: 14px;
+ }
+
+ .resultList{
+     margin-top: -5px;
+     background: #fff;
+     top: 45px;
+     left: 0;
+     border: none;
+     border-top: 1px solid #E4E6E7;
+     max-width: 300px;
+ }
+ .resultListItem{
+     background-color: #fff;
+     white-space: nowrap;
+     height: 32px;
+     line-height: 32px;
+     cursor: pointer;
+     background-repeat: no-repeat;
+     background-size: 40px;
+     font-size: 13px;
+     overflow: hidden;
+     color: #404040;
+ }
+ .resultListItem:hover{
+     background-color: rgba(0,0,0,0.1);
+ }
+.positionPic{
+    height: 20px;
+ 	width: 20px;
+ 	line-height: 20px;
+ 	font-size: 18px;
+ 	float: left;
+ 	margin: 6px;
+}
+/*搜索框样式结束*/
+
+/*绘制的提示信息样式*/
+.tooltip_draw{
+    position: absolute;
+    z-index: 101;
+    font-size: 12px;
+    line-height: 14px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    padding: 3px 7px 3px 2px;
+    white-space: nowrap;
+    color: #565656;
+}
+   
+/*选中删除的按钮样式*/
+#closePoint{
+	width:16px;
+    height:16px;
+    cursor:pointer;
+	background-image:url('../../images/gis/close.png');
+	background-color:#fff;
+    position:absolute;
+    top:10px;
+    left:10px;
+    z-index:101;
+    display:none;
+}
+
+/*分割线的样式*/
+#floorInfo{
+    position: absolute;
+    z-index: 5;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    max-width: 100px;
+    top: 30px;
+    right: 13px;
+    white-space: nowrap;
+    background-color: #fff;	
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.5);
+}
+.floorItemLine{
+    border-bottom: 1px solid #888;
+}
+.floorItem{
+	padding: 2px 5px;
+}
+.floorItem.selected{
+	background-color:#f7ca66;
+}
+
+.labeltip {
+     position: absolute;
+     z-index:100;
+     background: #59c5f9;
+     border-radius: 4px;
+     color: #060606;
+     padding: 3px 6px;
+     opacity: 0.9;
+     white-space: nowrap;
+     border:1px solid #0972a5;
+     moz-user-select: -moz-none;
+     -moz-user-select: none;
+     -o-user-select:none;
+     -khtml-user-select:none;
+     -webkit-user-select:none;
+     -ms-user-select:none;
+     user-select:none;
+     cursor: default;
+     font-size:12px;
+ }
+ /*.labeltip:after, .labeltip:before {
+     top: 100%;
+     border: solid transparent;
+     content: " ";
+     height: 0;
+     width: 0;
+     position: absolute;
+     pointer-events: none;
+ }
+ .labeltip:after {
+     border-top-color: #fff;
+     border-width: 7px;
+     left: 50%;
+     margin-left: -7px;
+ }
+ .labeltip:before {
+     border-top-color: #797956;
+     border-width: 8px;
+     left: 50%;
+     margin-left: -8px;
+ }*/
+ 
+ .statustip {
+    position: absolute;
+    background: rgb(64, 60, 60);
+    border-radius: 2px;
+    color: #e0d9d9;
+    padding: 0 2px;
+    /* opacity: 0.7; */
+    white-space: nowrap;
+    border: 2px solid #ff590a;
+    moz-user-select: -moz-none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+ .mapTypeSelectControl{
+     position:absolute;
+     bottom:20px;
+     left:20px;
+     z-index: 11;
+     width:200px;
+     height:30px;
+ }
+ .mapTypeSelectControl span
+ {
+     float: left;
+     height: 30px;
+     width: 55px;
+     border: 0;
+     cursor: pointer;
+     background-image:url("../../images/gis/maptype.png");
+     background-repeat: no-repeat;
+ }
+ .mapTypeSelectControl #mapTypejt
+ {
+     margin-right: -1px;
+     background-position: -4px -13px;
+ }
+ .mapTypeSelectControl #mapTypedx
+ {
+     background-position: -71px -13px;
+ }
+ .mapTypeSelectControl #mapTypewx
+ {
+     background-position: -138px -13px;
+ }  
+ .mapTypeSelectControl #mapTypejt.active
+ {
+     margin-right: -1px;
+     background-position: -4px -67px;
+ }
+ .mapTypeSelectControl #mapTypedx.active
+ {
+     background-position: -71px -67px;
+ }
+ .mapTypeSelectControl #mapTypewx.active
+ {
+     background-position: -138px -67px;
+ }

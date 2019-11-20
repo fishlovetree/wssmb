@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.ConstantDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.ConstantDetail" >
+    <id column="DETAILID" property="detailid" jdbcType="DECIMAL" />
+    <result column="CODING" property="coding" jdbcType="DECIMAL" />
+    <result column="DETAILNAME" property="detailname" jdbcType="VARCHAR" />
+    <result column="ENNAME" property="enname" jdbcType="VARCHAR" />
+    <result column="DETAILVALUE" property="detailvalue" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="PARENTID" property="parentid" jdbcType="DECIMAL" />
+    <result column="PARENTCODING" property="parentcoding" jdbcType="DECIMAL" />
+    <result column="PARENTVALUE" property="parentvalue" jdbcType="VARCHAR" />
+    <result column="PARENTNAME" property="parentname" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    DETAILID, CODING, DETAILNAME, ENNAME, DETAILVALUE, STATUS, PARENTID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_CONSTANTDETAIL
+    where DETAILID = #{detailid,jdbcType=DECIMAL}
+  </select>
+  
+   <select id="selectByDetailValue" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_CONSTANTDETAIL
+    where CODING = #{coding,jdbcType=DECIMAL} 
+    and DETAILValue = #{detailvalue,jdbcType=VARCHAR}
+    and STATUS = 1 
+  </select>
+  
+   <select id="selectByDetailName" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_CONSTANTDETAIL
+    where CODING = #{coding,jdbcType=DECIMAL} 
+    and DETAILNAME = #{detailname,jdbcType=VARCHAR}
+    and STATUS = 1 
+  </select>
+ 
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    update SYS_CONSTANTDETAIL
+    set STATUS = 0
+    where DETAILID = #{detailid,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.ConstantDetail" >
+    insert into SYS_CONSTANTDETAIL (CODING, DETAILNAME, 
+      ENNAME, DETAILVALUE, STATUS, PARENTID
+      )
+    values (#{coding,jdbcType=DECIMAL}, #{detailname,jdbcType=VARCHAR}, 
+      #{enname,jdbcType=VARCHAR}, #{detailvalue,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{parentid,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.ConstantDetail" >
+    insert into SYS_CONSTANTDETAIL
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="coding != null" >
+        CODING,
+      </if>
+      <if test="detailname != null" >
+        DETAILNAME,
+      </if>
+      <if test="enname != null" >
+        ENNAME,
+      </if>
+      <if test="detailvalue != null" >
+        DETAILVALUE,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="parentid != null" >
+        PARENTID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="coding != null" >
+        #{coding,jdbcType=DECIMAL},
+      </if>
+      <if test="detailname != null" >
+        #{detailname,jdbcType=VARCHAR},
+      </if>
+      <if test="enname != null" >
+        #{enname,jdbcType=VARCHAR},
+      </if>
+      <if test="detailvalue != null" >
+        #{detailvalue,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="parentid != null" >
+        #{parentid,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.ConstantDetail" >
+    update SYS_CONSTANTDETAIL
+    <set >
+      <if test="coding != null" >
+        CODING = #{coding,jdbcType=DECIMAL},
+      </if>
+      <if test="detailname != null" >
+        DETAILNAME = #{detailname,jdbcType=VARCHAR},
+      </if>
+      <if test="enname != null" >
+        ENNAME = #{enname,jdbcType=VARCHAR},
+      </if>
+      <if test="detailvalue != null" >
+        DETAILVALUE = #{detailvalue,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="parentid != null" >
+        PARENTID = #{parentid,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where DETAILID = #{detailid,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.ConstantDetail" >
+    update SYS_CONSTANTDETAIL
+    set CODING = #{coding,jdbcType=DECIMAL},
+      DETAILNAME = #{detailname,jdbcType=VARCHAR},
+      ENNAME = #{enname,jdbcType=VARCHAR},
+      DETAILVALUE = #{detailvalue,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      PARENTID = #{parentid,jdbcType=DECIMAL}
+    where DETAILID = #{detailid,jdbcType=DECIMAL}
+  </update>
+  <select id="selectListByCoding" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    cd.DETAILID, cd.CODING, cd.DETAILNAME, cd.ENNAME, cd.DETAILVALUE, cd.STATUS, cd.PARENTID,
+    t.CODING as parentcoding, t.DETAILVALUE as parentvalue, t.DETAILNAME as parentname
+    from SYS_CONSTANTDETAIL cd
+    left join SYS_CONSTANTDETAIL t on t.DETAILID = cd.PARENTID
+    where cd.CODING = #{coding,jdbcType=DECIMAL} and cd.STATUS = 1 order by cd.detailid
+  </select>
+  
+  <!--获取常量名名称数组  -->
+  <select id="selectNameArrayByCoding" resultType="String" parameterType="java.lang.Integer" >
+    select DETAILNAME
+    from SYS_CONSTANTDETAIL
+    where CODING = #{coding,jdbcType=DECIMAL} and STATUS = 1 
+  </select>
+  
+  <select id="selectList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    cd.DETAILID, cd.CODING, cd.DETAILNAME, cd.ENNAME, cd.DETAILVALUE, cd.STATUS, cd.PARENTID,
+    t.CODING as parentcoding, t.DETAILVALUE as parentvalue, t.DETAILNAME as parentname
+    from SYS_CONSTANTDETAIL cd
+    left join SYS_CONSTANTDETAIL t on t.DETAILID = cd.PARENTID
+    where cd.STATUS = 1 order by cd.detailid
+  </select>
+</mapper>

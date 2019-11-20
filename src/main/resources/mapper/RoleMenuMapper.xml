@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.RoleMenuMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.RoleMenuKey" >
+    <id column="ROLEID" property="roleid" jdbcType="DECIMAL" />
+    <id column="MENUID" property="menuid" jdbcType="DECIMAL" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="com.ssm.wssmb.model.RoleMenuKey" >
+    delete from SYS_ROLEFUN
+    where ROLEID = #{roleid,jdbcType=DECIMAL}
+      and MENUID = #{menuid,jdbcType=DECIMAL}
+  </delete>
+  
+    <!-- 通过集集合批量删除 -->
+  <delete id="deleteByList" >
+    delete from SYS_ROLEFUN where ROLEID= #{roleid,jdbcType=DECIMAL}
+    and MENUID in (<foreach collection="list" index="index" item="item" separator=",">
+          (#{item,jdbcType=INTEGER})
+       </foreach>)
+  </delete>
+  
+    <!-- 批量插入  mysql-->
+ <!--  <insert id="insertRolefuns" useGeneratedKeys="true">
+	insert into SYS_ROLEFUN (ROLEID, MENUID) VALUES
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{roleid,jdbcType=INTEGER},#{item,jdbcType=INTEGER})
+		</foreach>
+  </insert> -->
+  <!-- 批量插入  oracel-->
+  <insert id="insertRolefuns" useGeneratedKeys="false">
+	insert into SYS_ROLEFUN (ROLEID, MENUID) 
+		<foreach collection="list" index="index" item="item" separator="union all">
+		 (
+			SELECT 
+			#{roleid,jdbcType=INTEGER} ROLEID,
+			#{item,jdbcType=INTEGER} MENUID
+			FROM dual
+		)
+		</foreach>
+  </insert>
+	
+  <insert id="insert" parameterType="com.ssm.wssmb.model.RoleMenuKey" >
+    insert into SYS_ROLEFUN (ROLEID, MENUID)
+    values (#{roleid,jdbcType=DECIMAL}, #{menuid,jdbcType=DECIMAL})
+  </insert>
+  
+  <!--通过角色id查询拥有的菜单id  -->
+  <select id="selectByRoleId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select MENUID
+    from SYS_ROLEFUN
+    where ROLEID = #{roleid,jdbcType=DECIMAL}
+  </select>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.RoleMenuKey" >
+    insert into SYS_ROLEFUN
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="roleid != null" >
+        ROLEID,
+      </if>
+      <if test="menuid != null" >
+        MENUID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="roleid != null" >
+        #{roleid,jdbcType=DECIMAL},
+      </if>
+      <if test="menuid != null" >
+        #{menuid,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+</mapper>

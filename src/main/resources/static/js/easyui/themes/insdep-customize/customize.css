@@ -1,0 +1,101 @@
+/* layout */
+.layout-panel-center{
+	border:0px;
+}
+
+/* panel */
+.panel-body {
+    background-color: #ffffff;   
+    border: 0px;
+}
+
+/* datagrid */
+.datagrid-view {
+	
+}
+
+.datagrid-row-over{
+	background:#f2f2f2;
+}
+
+.datagrid-cell-rownumber{
+	color: #000000;
+	font-weight: 700;
+}
+
+.datagrid-row-selected {
+	background: #e3e3e3;
+    color: #b83400;
+}
+
+.datagrid-toolbar {
+    
+}
+
+.datagrid-toolbar .l-btn {
+    
+}
+
+.datagrid-toolbar .l-btn .l-btn-icon-left .l-btn-text {
+    margin: 1px 8px 1px 25px;
+}
+
+.datagrid-header, .datagrid-td-rownumber {
+    background-color: #fcfcfc;
+    color: #060606;
+}
+
+.datagrid-header-row, .datagrid-header-row td span{
+	font-weight:700;
+}
+
+.datagrid-header td.datagrid-header-over{
+	background:#eee2d0;
+}
+
+.datagrid-cell .l-btn-text {
+    color: #fbfbfb;
+}
+
+.datagrid-btable {
+    background: #fff;
+}
+
+/* .datagrid-body td a,.datagrid-row-selected a {
+    color: #f57908 !important;
+} */
+
+/* tree */
+.tree-node {
+    height: 22px;
+}
+
+.tree li{
+	margin: 1px 0 1px 0;
+}
+
+.tree-node {
+    /* padding: 3px 0 3px 0;
+    margin-top: 0px; */
+	/* color: #654b24; */
+}
+
+.tree-node-hover, .tree-node-selected {
+    background: #e3e3e3;
+    color: #b83400;
+}
+
+/* button */
+
+
+/* tabs */
+.tabs li a.tabs-inner {
+  height: 25px;
+  line-height: 25px;
+}
+
+/* .tabs .tabs-title{
+    position: relative;
+    top: 3px;
+} */
+   

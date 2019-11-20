@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.ssm.wssmb.mapper.BusRemotealarmsmsrecordMapper">
+	<resultMap id="BaseResultMap"
+		type="com.ssm.wssmb.model.BusRemotealarmsmsrecord">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="systemType" property="systemtype"
+			jdbcType="INTEGER" />
+		<result column="equipmentAddress" property="equipmentaddress"
+			jdbcType="VARCHAR" />
+		<result column="measureAddress" property="measureAddress"
+			jdbcType="VARCHAR" />
+		<result column="eventId" property="eventid" jdbcType="INTEGER" />
+		<result column="happenTime" property="happentime"
+			jdbcType="TIMESTAMP" />
+		<result column="recordTime" property="recordtime"
+			jdbcType="TIMESTAMP" />
+		<result column="result" property="result" jdbcType="INTEGER" />
+		<result column="user" property="user" jdbcType="VARCHAR" />
+		<result column="msgType" property="msgType" jdbcType="INTEGER" />
+		<result column="notifier" property="notifier"
+			jdbcType="INTEGER" />
+		<result column="cumulativeNum" property="cumulativeNum"
+			jdbcType="INTEGER" />
+		<result column="equipmentname" property="equipmentname"
+			jdbcType="VARCHAR" />
+		<result column="measurename" property="measurename"
+			jdbcType="VARCHAR" />
+		<result column="installationLocation"
+			property="installationLocation" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="DETAILNAME" property="DETAILNAME"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectList" resultMap="BaseResultMap">
+		select * from ( SELECT b.*,m.*,t.terminalName as
+		equipmentname,t.address AS
+		equipaddress,t.installationLocation,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_terminal t)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND b.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT b.*,m.*,a.ammeterName,a.ammeterCode AS
+		equipaddress,a.installAddress,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_ammeter a)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND
+		b.equipmentAddress=a.ammeterCode
+		AND a.boxCode=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.happenTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="result != null and result != ''">
+			and cast(g.result as SIGNED ) =
+			#{result,jdbcType=INTEGER}
+		</if>
+		<if test="eventid != null and eventid != ''">
+			and cast(g.eventid as SIGNED ) =
+			#{eventid,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipmentname like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipaddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectListCount" resultType="java.lang.Integer">
+		select count(0) from ( SELECT b.*,m.*,t.terminalName as
+		equipmentname,t.address AS
+		equipaddress,t.installationLocation,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_terminal t)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND b.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT b.*,m.*,a.ammeterName,a.ammeterCode AS
+		equipaddress,a.installAddress,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_ammeter a)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND
+		b.equipmentAddress=a.ammeterCode
+		AND a.boxCode=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.happenTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="result != null and result != ''">
+			and cast(g.result as SIGNED ) =
+			#{result,jdbcType=INTEGER}
+		</if>
+		<if test="eventid != null and eventid != ''">
+			and cast(g.eventid as SIGNED ) =
+			#{eventid,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipmentname like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipaddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+
+	<select id="selectTerminalRecord" resultMap="BaseResultMap">
+		select * from ( SELECT b.*,m.*,t.terminalName as
+		equipmentname,t.address AS
+		equipaddress,t.installationLocation,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_terminal t)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND b.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		and t.terminalId=#{id,jdbcType=INTEGER}
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.happenTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="result != null and result != ''">
+			and cast(g.result as SIGNED ) =
+			#{result,jdbcType=INTEGER}
+		</if>
+		<if test="eventid != null and eventid != ''">
+			and cast(g.eventid as SIGNED ) =
+			#{eventid,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipmentname like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipaddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByTerminalRecordCount"
+		resultType="java.lang.Integer">
+		select count(0) from ( SELECT b.*,m.*,t.terminalName as
+		equipmentname,t.address AS
+		equipaddress,t.installationLocation,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_terminal t)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND b.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		and t.terminalId=#{id,jdbcType=INTEGER}
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.happenTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="result != null and result != ''">
+			and cast(g.result as SIGNED ) =
+			#{result,jdbcType=INTEGER}
+		</if>
+		<if test="eventid != null and eventid != ''">
+			and cast(g.eventid as SIGNED ) =
+			#{eventid,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipmentname like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipaddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+	
+	<select id="selectAmmeterRecord" resultMap="BaseResultMap">
+		select * from ( SELECT b.*,m.*,t.ammeterName as
+		equipmentname,t.ammeterCode AS
+		equipaddress,t.installAddress as installationLocation,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_ammeter t)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND b.equipmentAddress=t.ammeterCode
+		AND
+		t.boxCode=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		and t.id=#{id,jdbcType=INTEGER}
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.happenTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="result != null and result != ''">
+			and cast(g.result as SIGNED ) =
+			#{result,jdbcType=INTEGER}
+		</if>
+		<if test="eventid != null and eventid != ''">
+			and cast(g.eventid as SIGNED ) =
+			#{eventid,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipmentname like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipaddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByAmmeterRecordCount"
+		resultType="java.lang.Integer">
+		select count(0) from ( SELECT b.*,m.*,t.ammeterName as
+		equipmentname,t.ammeterCode AS
+		equipaddress,t.installAddress as installationLocation,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_ammeter t)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND b.equipmentAddress=t.ammeterCode
+		AND
+		t.boxCode=m.MeasureId
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		and t.id=#{id,jdbcType=INTEGER}
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.happenTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="result != null and result != ''">
+			and cast(g.result as SIGNED ) =
+			#{result,jdbcType=INTEGER}
+		</if>
+		<if test="eventid != null and eventid != ''">
+			and cast(g.eventid as SIGNED ) =
+			#{eventid,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipmentname like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipaddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+
+	<select id="selectEquipmentRecord" resultMap="BaseResultMap">
+		select * from ( SELECT b.*,m.*,t.terminalName as
+		equipmentname,t.address AS
+		equipaddress,t.installationLocation,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_terminal t)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND b.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		and ${terdition}
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT b.*,m.*,a.ammeterName,a.ammeterCode AS
+		equipaddress,a.installAddress,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_ammeter a)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND
+		b.equipmentAddress=a.ammeterCode
+		AND a.boxCode=m.MeasureId
+		and
+		${amdition}
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.happenTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="result != null and result != ''">
+			and cast(g.result as SIGNED ) =
+			#{result,jdbcType=INTEGER}
+		</if>
+		<if test="eventid != null and eventid != ''">
+			and cast(g.eventid as SIGNED ) =
+			#{eventid,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipmentname like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipaddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByEquipmentRecordCount"
+		resultType="java.lang.Integer">
+		select count(0) from ( SELECT b.*,m.*,t.terminalName as
+		equipmentname,t.address AS
+		equipaddress,t.installationLocation,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_terminal t)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND b.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		and ${terdition}
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT b.*,m.*,a.ammeterName,a.ammeterCode AS
+		equipaddress,a.installAddress,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_ammeter a)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND
+		b.equipmentAddress=a.ammeterCode
+		AND a.boxCode=m.MeasureId
+		and
+		${amdition}
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.happenTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="result != null and result != ''">
+			and cast(g.result as SIGNED ) =
+			#{result,jdbcType=INTEGER}
+		</if>
+		<if test="eventid != null and eventid != ''">
+			and cast(g.eventid as SIGNED ) =
+			#{eventid,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipmentname like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipaddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+
+	<select id="selectRegionRecord" resultMap="BaseResultMap">
+		select * from ( SELECT gg.id as reig,b.*,m.*,t.terminalName as
+		equipmentname,t.address AS
+		equipaddress,t.installationLocation,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_terminal t,(SELECT id
+		FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT
+		JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND
+		b.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		m.Region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT gg.id as reig,b.*,m.*,a.ammeterName,a.ammeterCode AS
+		equipaddress,a.installAddress,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_ammeter a,(SELECT id
+		FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT
+		JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND
+		b.equipmentAddress=a.ammeterCode
+		AND a.boxCode=m.MeasureId
+		AND
+		m.Region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.happenTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="result != null and result != ''">
+			and cast(g.result as SIGNED ) =
+			#{result,jdbcType=INTEGER}
+		</if>
+		<if test="eventid != null and eventid != ''">
+			and cast(g.eventid as SIGNED ) =
+			#{eventid,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipmentname like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipaddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by g.id asc
+		limit
+		#{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByRegionRecordCount"
+		resultType="java.lang.Integer">
+		select count(0) from ( SELECT gg.id as reig,b.*,m.*,t.terminalName as
+		equipmentname,t.address AS
+		equipaddress,t.installationLocation,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_terminal t,(SELECT id
+		FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT
+		JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND
+		b.equipmentAddress=t.address
+		AND
+		t.measureId=m.MeasureId
+		AND
+		m.Region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT gg.id as reig,b.*,m.*,a.ammeterName,a.ammeterCode AS
+		equipaddress,a.installAddress,sc.DETAILNAME
+		FROM
+		(bus_remotealarmsmsrecord b,mb_measurefile m,mb_ammeter a,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg)
+		LEFT JOIN
+		SYS_CONSTANTDETAIL sc ON b.eventid=sc.DETAILVALUE AND
+		sc.CODING=1011
+		WHERE
+		b.measureAddress=m.MeasureNumber AND
+		b.equipmentAddress=a.ammeterCode
+		AND a.boxCode=m.MeasureId
+		AND m.Region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(m.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		)g
+		where 1=1
+		<if
+			test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+			AND date_format(g.happenTime,'%Y-%m-%d %H:%i:%s') BETWEEN
+			#{startTime,jdbcType=VARCHAR}
+			and #{endTime,jdbcType=VARCHAR}
+		</if>
+		<if test="result != null and result != ''">
+			and cast(g.result as SIGNED ) =
+			#{result,jdbcType=INTEGER}
+		</if>
+		<if test="eventid != null and eventid != ''">
+			and cast(g.eventid as SIGNED ) =
+			#{eventid,jdbcType=INTEGER}
+		</if>
+		<if test="equipmentname != null and equipmentname != ''">
+			and g.equipmentname like
+			concat(concat('%',#{equipmentname,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and g.equipaddress like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+</mapper>

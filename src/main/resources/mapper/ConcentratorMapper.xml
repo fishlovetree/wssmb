@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.ConcentratorMapper">
+	<resultMap id="BaseResultMap"
+		type="com.ssm.wssmb.model.Concentrator">
+		<result column="concentratorId" property="concentratorId"
+			jdbcType="INTEGER" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="installationLocation"
+			property="installationLocation" jdbcType="VARCHAR" />
+		<result column="measureId" property="measureId"
+			jdbcType="INTEGER" />
+		<result column="organizationId" property="organizationId"
+			jdbcType="INTEGER" />
+		<result column="manufacturer" property="manufacturer"
+			jdbcType="VARCHAR" />
+		<result column="produceDate" property="produceDate"
+			jdbcType="TIMESTAMP" />
+		<result column="creater" property="creater" jdbcType="VARCHAR" />
+		<result column="createDate" property="createDate"
+			jdbcType="TIMESTAMP" />
+		<result column="simCard" property="simCard" jdbcType="VARCHAR" />
+		<result column="softType" property="softType"
+			jdbcType="VARCHAR" />
+		<result column="hardType" property="hardType"
+			jdbcType="VARCHAR" />
+		<result column="concentratorType" property="concentratorType"
+			jdbcType="INTEGER" />
+		<result column="statuteType" property="statuteType"
+			jdbcType="INTEGER" />
+		<result column="concentratorName" property="concentratorName"
+			jdbcType="VARCHAR" />
+		<result column="Region" property="Region" jdbcType="INTEGER" />
+		<association property="organization"
+			javaType="com.ssm.wssmb.model.Organization">
+			<result property="organizationname" column="ORGANIZATIONNAME"
+				jdbcType="VARCHAR" />
+		</association>
+		<association property="measureFile"
+			javaType="com.ssm.wssmb.model.MeasureFile">
+			<result property="measureName" column="MeasureName"
+				jdbcType="VARCHAR" />
+		</association>
+	</resultMap>
+
+	<select id="selectList" resultMap="BaseResultMap">
+		SELECT
+		a.*,b.ORGANIZATIONNAME,d.MeasureName
+		FROM mb_concentrator
+		a,sys_organization b,mb_measurefile d
+		WHERE
+		a.OrganizationId=b.ORGANIZATIONID AND a.measureId=d.MeasureId and
+		IS_PARENT_ORGANIZATION(a.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		ORDER BY concentratorId asc
+	</select>
+
+	<select id="organizationClickTreeList" resultMap="BaseResultMap">
+		SELECT
+		a.*,b.ORGANIZATIONNAME,d.MeasureName
+		FROM mb_concentrator
+		a,sys_organization b,mb_measurefile d
+		WHERE
+		a.OrganizationId=b.ORGANIZATIONID AND a.measureId=d.MeasureId
+		AND IS_PARENT_ORGANIZATION(a.OrganizationId,#{id,jdbcType=INTEGER})=1
+		<if test="name != null and name != ''">
+			and a.concentratorName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		ORDER BY concentratorId asc
+	</select>
+
+	<select id="regionClickTreeList" resultMap="BaseResultMap">
+		SELECT
+		gg.id AS reig,a.*,b.ORGANIZATIONNAME,d.MeasureName
+		FROM mb_concentrator
+		a,sys_organization b,mb_measurefile d,(SELECT id FROM view_regiontree
+		WHERE
+		id=#{id,jdbcType=INTEGER} OR pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		a.OrganizationId=b.ORGANIZATIONID
+		AND a.measureId=d.MeasureId and
+		a.Region=gg.id
+		ORDER BY concentratorId asc
+	</select>
+	
+	<select id="regionClickTreeLists" resultMap="BaseResultMap">
+		SELECT
+		gg.id AS reig,a.*,b.ORGANIZATIONNAME,d.MeasureName
+		FROM mb_concentrator
+		a,sys_organization b,mb_measurefile d,(SELECT id FROM view_regiontree
+		WHERE
+		id=#{id,jdbcType=INTEGER} OR pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		a.OrganizationId=b.ORGANIZATIONID
+		AND a.measureId=d.MeasureId and
+		a.Region=gg.id
+		<if test="name != null and name != ''">
+			and a.concentratorName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		ORDER BY concentratorId asc
+	</select>
+
+	<insert id="insert"
+		parameterType="com.ssm.wssmb.model.Concentrator">
+		insert into mb_concentrator
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="concentratorName != null">
+				concentratorName,
+			</if>
+			<if test="address != null">
+				address,
+			</if>
+			<if test="measureId != null">
+				measureId,
+			</if>
+			<if test="installationLocation != null">
+				installationLocation,
+			</if>
+			<if test="organizationId != null">
+				organizationId,
+			</if>
+			<if test="region != null">
+				region,
+			</if>
+			<if test="manufacturer != null">
+				manufacturer,
+			</if>
+			<if test="produceDate != null">
+				produceDate,
+			</if>
+			<if test="creater != null">
+				creater,
+			</if>
+			<if test="createDate != null">
+				createDate,
+			</if>
+			<if test="simCard != null">
+				simCard,
+			</if>
+			<if test="softType != null">
+				softType,
+			</if>
+			<if test="hardType != null">
+				hardType,
+			</if>
+			<if test="concentratorType != null">
+				concentratorType,
+			</if>
+			<if test="statuteType != null">
+				statuteType,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="concentratorName != null">
+				#{concentratorName,jdbcType=VARCHAR},
+			</if>
+			<if test="address != null">
+				#{address,jdbcType=VARCHAR},
+			</if>
+			<if test="measureId != null">
+				#{measureId,jdbcType=INTEGER},
+			</if>
+			<if test="installationLocation != null">
+				#{installationLocation,jdbcType=VARCHAR},
+			</if>
+			<if test="organizationId != null">
+				#{organizationId,jdbcType=INTEGER},
+			</if>
+			<if test="region != null">
+				#{region,jdbcType=INTEGER},
+			</if>
+			<if test="manufacturer != null">
+				#{manufacturer,jdbcType=VARCHAR},
+			</if>
+			<if test="produceDate != null">
+				#{produceDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="creater != null">
+				#{creater,jdbcType=VARCHAR},
+			</if>
+			<if test="createDate != null">
+				#{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="simCard != null">
+				#{simCard,jdbcType=VARCHAR},
+			</if>
+			<if test="softType != null">
+				#{softType,jdbcType=VARCHAR},
+			</if>
+			<if test="hardType != null">
+				#{hardType,jdbcType=VARCHAR},
+			</if>
+			<if test="concentratorType != null">
+				#{concentratorType,jdbcType=VARCHAR},
+			</if>
+			<if test="statuteType != null">
+				#{statuteType,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update"
+		parameterType="com.ssm.wssmb.model.Concentrator">
+		update mb_concentrator
+		<set>
+			<if test="concentratorName != null">
+				concentratorName= #{concentratorName,jdbcType=VARCHAR},
+			</if>
+			<if test="address != null">
+				address=#{address,jdbcType=VARCHAR},
+			</if>
+			<if test="measureId != null">
+				measureId=#{measureId,jdbcType=INTEGER},
+			</if>
+			<if test="installationLocation != null">
+				installationLocation=#{installationLocation,jdbcType=VARCHAR},
+			</if>
+			<if test="organizationId != null">
+				organizationId=#{organizationId,jdbcType=VARCHAR},
+			</if>
+			<if test="region != null">
+				region=#{region,jdbcType=INTEGER},
+			</if>
+			<if test="manufacturer != null">
+				manufacturer=#{manufacturer,jdbcType=VARCHAR},
+			</if>
+			<if test="produceDate != null">
+				produceDate=#{produceDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="creater != null">
+				creater=#{creater,jdbcType=VARCHAR},
+			</if>
+			<if test="createDate != null">
+				createDate=#{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="simCard != null">
+				simCard=#{simCard,jdbcType=VARCHAR},
+			</if>
+			<if test="softType != null">
+				softType=#{softType,jdbcType=VARCHAR},
+			</if>
+			<if test="hardType != null">
+				hardType=#{hardType,jdbcType=VARCHAR},
+			</if>
+			<if test="concentratorType != null">
+				concentratorType=#{concentratorType,jdbcType=VARCHAR},
+			</if>
+			<if test="statuteType != null">
+				statuteType=#{statuteType,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where concentratorId = #{concentratorId,jdbcType=INTEGER}
+	</update>
+
+	<delete id="delete"
+		parameterType="com.ssm.wssmb.model.Concentrator">
+		delete from mb_concentrator
+		where concentratorId =
+		#{concentratorId,jdbcType=INTEGER}
+	</delete>
+
+	<select id="selectCount" resultType="java.lang.Integer">
+		select
+		count(0)
+		from
+		mb_concentrator where concentratorId =
+		#{concentratorId,jdbcType=INTEGER}
+	</select>
+
+	<select id="getMeasureId"
+		parameterType="com.ssm.wssmb.model.Concentrator" resultType="Integer">
+		select
+		MeasureId from mb_measurefile
+		where
+		MeasureName=#{measureName,jdbcType=VARCHAR} and
+		Region=#{region,jdbcType=INTEGER}
+	</select>
+	<select id="getConcentratorByMeasurefile"
+		resultMap="BaseResultMap">
+		SELECT *
+		FROM mb_concentrator
+		WHERE measureId=
+		#{measureId,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getConcentratorAndNameByMeasureId"
+		resultMap="BaseResultMap">
+		SELECT
+		a.*,b.ORGANIZATIONNAME,d.MeasureName
+		FROM mb_concentrator
+		a,sys_organization b,mb_measurefile d
+		WHERE
+		a.OrganizationId=b.ORGANIZATIONID
+		AND a.measureId=d.MeasureId 
+		and a.measureId=#{measureId,jdbcType=INTEGER}
+		<if test="name != null and name != ''">
+			and a.concentratorName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+
+	<select id="getConcentratorByid" resultMap="BaseResultMap">
+		SELECT *
+		FROM
+		mb_concentrator
+		WHERE concentratorId=
+		#{concentratorId,jdbcType=INTEGER}
+	</select>
+
+	<select id="searchInf" resultMap="BaseResultMap">
+		SELECT a.*,b.ORGANIZATIONNAME,d.MeasureName
+		FROM mb_concentrator
+		a,sys_organization b,mb_measurefile d
+		WHERE
+		a.OrganizationId=b.ORGANIZATIONID AND a.measureId=d.MeasureId
+		<if test=" ConcentratorName != null and ConcentratorName !=''">
+			and concentratorName like CONCAT(CONCAT('%',
+			#{ConcentratorName,jdbcType=VARCHAR}), '%')
+		</if>
+		<if test=" Address != null and Address !=''">
+			and a.address like CONCAT(CONCAT('%',
+			#{Address,jdbcType=VARCHAR}), '%')
+		</if>
+		order by concentratorId desc
+		limit #{startindex,jdbcType=INTEGER} ,
+		#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getConcentratorCount" resultType="Integer">
+		SELECT count(0)
+		FROM mb_concentrator a,sys_organization
+		b,mb_measurefile d
+		WHERE a.OrganizationId=b.ORGANIZATIONID AND
+		a.measureId=d.MeasureId
+		<if test=" ConcentratorName != null and ConcentratorName !=''">
+			and concentratorName like CONCAT(CONCAT('%',
+			#{ConcentratorName,jdbcType=VARCHAR}), '%')
+		</if>
+		<if test=" Address != null and Address !=''">
+			and a.address like CONCAT(CONCAT('%',
+			#{Address,jdbcType=VARCHAR}), '%')
+		</if>
+	</select>
+
+	<select id="getConcentratorByMeasureId"
+		resultMap="BaseResultMap">
+		select * from mb_concentrator
+		where
+		measureId=#{measureId,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getConcentratorCountByMeasureId"
+		resultType="Integer">
+		select count(0) from mb_concentrator
+		where
+		measureId=#{measureId,jdbcType=INTEGER}
+	</select>
+
+	<select id="getConcentratorId" resultType="Integer">
+		select concentratorId
+		from mb_concentrator
+		where
+		concentratorName=#{concentratorName,jdbcType=VARCHAR}
+	</select>
+
+
+	<select id="getCodeByName" resultType="java.lang.Integer">
+		SELECT concentratorId
+		FROM
+		mb_concentrator
+		WHERE concentratorName=
+		#{concentratorName,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getAllAddress" resultType="java.lang.String">
+	select address from mb_concentrator
+	</select>
+	
+	<select id="getByIdAndType" resultMap="BaseResultMap">
+	SELECT
+		a.*,b.ORGANIZATIONNAME,d.MeasureName
+		FROM mb_concentrator
+		a,sys_organization b,mb_measurefile d
+		WHERE
+		a.OrganizationId=b.ORGANIZATIONID
+		AND a.measureId=d.MeasureId 
+		and a.concentratorId=#{id,jdbcType=INTEGER}
+		<if test="name != null and name != ''">
+			and a.concentratorName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+</mapper>
+  

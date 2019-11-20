@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.BusFreezedataMapper">
+	<resultMap type="com.ssm.wssmb.model.Elecdayfreezedata"
+		id="elecDayMap">
+		<result column="FREEZETIME" property="freezeTime"
+			javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="OI" property="oi" jdbcType="VARCHAR" />
+		<result column="GROUPINDEX" property="groupIndex"
+			jdbcType="INTEGER" />
+		<result column="DATA" property="data" jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<resultMap type="com.ssm.wssmb.model.Elecrealtimefreezedata"
+		id="elecMap">
+		<result column="FREEZETIME" property="freezetime"
+			javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="POSITIVEELECTRICITY"
+			property="positiveelectricity" jdbcType="DECIMAL" />
+		<result column="POSITIVEELECTRICITYA"
+			property="positiveelectricitya" jdbcType="DECIMAL" />
+		<result column="POSITIVEELECTRICITYB"
+			property="positiveelectricityb" jdbcType="DECIMAL" />
+		<result column="POSITIVEELECTRICITYC"
+			property="positiveelectricityc" jdbcType="DECIMAL" />
+		<result column="REVERSEELECTRICITY"
+			property="reverseelectricity" jdbcType="DECIMAL" />
+		<result column="REVERSEELECTRICITYA"
+			property="reverseelectricitya" jdbcType="DECIMAL" />
+		<result column="REVERSEELECTRICITYB"
+			property="reverseelectricityb" jdbcType="DECIMAL" />
+		<result column="REVERSEELECTRICITYC"
+			property="reverseelectricityc" jdbcType="DECIMAL" />
+		<result column="VOLTAGEA" property="voltagea"
+			jdbcType="DECIMAL" />
+		<result column="VOLTAGEB" property="voltageb"
+			jdbcType="DECIMAL" />
+		<result column="VOLTAGEC" property="voltagec"
+			jdbcType="DECIMAL" />
+		<result column="CUEEENTA" property="cueeenta"
+			jdbcType="DECIMAL" />
+		<result column="CUEEENTB" property="cueeentb"
+			jdbcType="DECIMAL" />
+		<result column="CUEEENTC" property="cueeentc"
+			jdbcType="DECIMAL" />
+		<result column="RESIDUALCUEEENT" property="residualcueeent"
+			jdbcType="DECIMAL" />
+		<result column="POWER" property="power" jdbcType="DECIMAL" />
+		<result column="POWERA" property="powera" jdbcType="DECIMAL" />
+		<result column="POWERB" property="powerb" jdbcType="DECIMAL" />
+		<result column="POWERC" property="powerc" jdbcType="DECIMAL" />
+		<result column="PF" property="pf" jdbcType="DECIMAL" />
+		<result column="PFA" property="pfa" jdbcType="DECIMAL" />
+		<result column="PFB" property="pfb" jdbcType="DECIMAL" />
+		<result column="PFC" property="pfc" jdbcType="DECIMAL" />
+		<result column="FREQUENCY" property="frequency"
+			jdbcType="DECIMAL" />
+		<result column="TEMPERATUREA" property="temperaturea"
+			jdbcType="DECIMAL" />
+		<result column="TEMPERATUREB" property="temperatureb"
+			jdbcType="DECIMAL" />
+		<result column="TEMPERATUREC" property="temperaturec"
+			jdbcType="DECIMAL" />
+		<result column="TEMPERATUREN" property="temperaturen"
+			jdbcType="DECIMAL" />
+		<result column="AMBIENTTEMPERATURE"
+			property="ambienttemperature" jdbcType="DECIMAL" />
+		<result column="INTERNALBATTERYVOLTAGE"
+			property="internalbatteryvoltage" jdbcType="DECIMAL" />
+		<result column="EXTERNALBATTERYVOLTAGE"
+			property="externalbatteryvoltage" jdbcType="DECIMAL" />
+		<result column="humidness" property="humidness"
+			jdbcType="VARCHAR" />
+		<result column="gasconcentration" property="gasconcentration"
+			jdbcType="VARCHAR" />
+		<result column="error" property="error" jdbcType="VARCHAR" />
+		<result column="barometricPressure"
+			property="barometricPressure" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- 根据设备地址和选取时间获取冻结主表id -->
+	<select id="getDayIdByEquipmentAddress" resultType="Integer">
+		select id from
+		bus_freezedata
+		where
+		EQUIPMENTADDRESS=#{equipmentaddress,jdbcType=VARCHAR} and
+		EQUIPMENTTYPE=#{type,jdbcType=INTEGER}
+		<if test="startdate !=null and startdate !=''">
+			and FREEZETIME &gt;
+			date_format(#{startdate,jdbcType=VARCHAR},'%Y-%m-%d
+			%H:%i:%s')
+		</if>
+		<if test="enddate !=null and enddate !=''">
+			and FREEZETIME &lt;
+			date_format(#{enddate,jdbcType=VARCHAR},'%Y-%m-%d
+			%H:%i:%s')
+		</if>
+		order by FREEZETIME asc
+	</select>
+	
+	<!-- 根据设备地址和选取时间获取实时数据主表id -->
+	<select id="getRealIdByEquipmentAddress" resultType="Integer">
+		select id from
+		bus_freezedata_rtele
+		where
+		EQUIPMENTADDRESS=#{equipmentaddress,jdbcType=VARCHAR} and
+		EQUIPMENTTYPE=#{type,jdbcType=INTEGER}
+		<if test="startdate !=null and startdate !=''">
+			and FREEZETIME &gt;
+			date_format(#{startdate,jdbcType=VARCHAR},'%Y-%m-%d
+			%H:%i:%s')
+		</if>
+		<if test="enddate !=null and enddate !=''">
+			and FREEZETIME &lt;
+			date_format(#{enddate,jdbcType=VARCHAR},'%Y-%m-%d
+			%H:%i:%s')
+		</if>
+		order by FREEZETIME asc
+	</select>
+
+	<!-- 获取冻结数据 -->
+	<select id="getDayFreezeData" resultMap="elecDayMap">
+		SELECT r.FREEZETIME,d.*,o.oi FROM bus_freezedatadtl
+		d,bus_freezedata r,sys_oad o
+		WHERE FIND_IN_SET(o.name,#{name,jdbcType=VARCHAR})
+		AND d.id=#{id,jdbcType=INTEGER} AND r.id=#{id,jdbcType=INTEGER} AND
+		o.oi=d.oi		
+	</select>
+	
+	<!-- 获取实时数据 -->
+	<select id="getRealFreezeData" resultMap="elecDayMap">
+		SELECT r.FREEZETIME,d.*,o.oi FROM bus_freezedatadtl_rtele
+		d,bus_freezedata_rtele r,sys_oad o
+		WHERE FIND_IN_SET(o.name,#{name,jdbcType=VARCHAR})
+		AND d.id=#{id,jdbcType=INTEGER} AND r.id=#{id,jdbcType=INTEGER} AND
+		o.oi=d.oi		
+	</select>
+
+	<!-- 获取电表实时正向总电量（用于三维模型） -->
+	<select id="getRealtimePsitiveelectricity" resultType="String">
+		select
+		positiveelectricity
+		from BUS_ELECREALTIMEFREEZEDATA
+		where
+		equipmentaddress=#{equipmentaddress,jdbcType=VARCHAR}
+		order by
+		FREEZETIME DESC limit 1
+	</select>
+
+	<!-- 获取监测终端实时环境温度、大气压力、空气湿度（用于三维模型） -->
+	<select id="getTerminalDataForVirtual" resultMap="elecMap">
+		select *
+		from
+		BUS_ELECREALTIMEFREEZEDATA
+		where
+		equipmentaddress=#{equipmentaddress,jdbcType=VARCHAR}
+		order by
+		FREEZETIME DESC limit 1
+	</select>
+
+</mapper>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.SysErrorlogMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.SysErrorlog" >
+    <id column="LOGID" property="logid" jdbcType="DECIMAL" />
+    <result column="USERID" property="userid" jdbcType="DECIMAL" />
+    <result column="IP" property="ip" jdbcType="VARCHAR" />
+    <result column="BROWSER" property="browser" jdbcType="VARCHAR" />
+    <result column="MESSAGE" property="message" jdbcType="VARCHAR" />
+    <result column="STACKTRACE" property="stacktrace" jdbcType="VARCHAR" />
+    <result column="ACTION" property="action" jdbcType="VARCHAR" />
+    <result column="ERRORCLASS" property="errorclass" jdbcType="VARCHAR" />
+    <result column="INTIME" property="intime" jdbcType="TIMESTAMP" />
+    
+    <association property="user" javaType="com.ssm.wssmb.model.User">
+    	<result column="USERLOGIN" property="userlogin" jdbcType="VARCHAR" />
+	    <result column="USERNAME" property="username" jdbcType="VARCHAR" />
+	    <result column="USERPWD" property="userpwd" jdbcType="VARCHAR" />
+	    <result column="DEPARTMENTID" property="departmentid" jdbcType="VARCHAR" />
+	    <result column="PHONE" property="phone" jdbcType="VARCHAR" />
+	    <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+	    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+	    <result column="STATUS" property="status" jdbcType="DECIMAL" /> 
+  </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    LOGID, USERID, IP, BROWSER, MESSAGE, STACKTRACE, ACTION, ERRORCLASS, INTIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  select e.*,u.username  from SYS_ERRORLOG e
+    <!-- <include refid="Base_Column_List" /> -->
+    left join Sys_User u on u.id = e.userid
+    where e.LOGID = #{logid,jdbcType=DECIMAL}
+  </select>
+  
+  <select id="selectLogs"  resultMap="BaseResultMap">
+     SELECT * FROM(
+     select e.*,u.username
+     from sys_errorlog e
+     left join Sys_User u on u.id = e.userid
+     left join view_organization o on o.code = u.organizationcode
+     where 1=1
+     <if test="orglist !=null and orglist">
+     	 and o.code in
+		<foreach collection="orglist" index="index" item="item" open="(" close=")"
+			separator=",">
+			#{item.code,jdbcType=VARCHAR}
+		</foreach>
+	  </if>
+      <if test="user != null and user!='' ">
+       and u.username like CONCAT(CONCAT('%', #{user,jdbcType=VARCHAR}), '%')
+      </if> 
+ 
+      <if test="starttime!=null and starttime!='' and endtime!=null and endtime!=''">
+	AND date_format(e.INTIME,'%Y-%m-%d %H:%i:%s') BETWEEN #{starttime,jdbcType=VARCHAR}
+ and #{endtime,jdbcType=VARCHAR}		 
+		</if> 
+     order by e.intime DESC  ) t      
+       ORDER BY t.intime DESC 
+       limit   #{startin,jdbcType=DECIMAL} , #{endindex,jdbcType=DECIMAL}
+  </select>
+  
+  <select id="selectLogsCount" resultType="java.lang.Integer">
+     select count(0) from sys_errorlog e
+     left join Sys_User u on u.id = e.userid
+     left join view_organization o on o.code = u.organizationcode
+     where 1=1
+     <if test="orglist !=null and orglist">
+     	 and o.code in
+		<foreach collection="orglist" index="index" item="item" open="(" close=")"
+			separator=",">
+			#{item.code,jdbcType=VARCHAR}
+		</foreach>
+	  </if>
+      <if test="user != null and user!='' ">
+       and u.username like CONCAT(CONCAT('%', #{user,jdbcType=VARCHAR}), '%')
+      </if> 
+       <if test="starttime!=null and starttime!='' and endtime!=null and endtime!=''">
+	AND date_format(e.INTIME,'%Y-%m-%d %H:%i:%s') BETWEEN #{starttime,jdbcType=VARCHAR}
+ and #{endtime,jdbcType=VARCHAR}		 
+		</if> 
+     
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from SYS_ERRORLOG
+    where LOGID = #{logid,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.SysErrorlog" >
+    insert into SYS_ERRORLOG (USERID, IP, 
+      BROWSER, MESSAGE, STACKTRACE, 
+      ACTION, ERRORCLASS, INTIME
+      )
+    values (#{userid,jdbcType=DECIMAL}, #{ip,jdbcType=VARCHAR}, 
+      #{browser,jdbcType=VARCHAR}, #{message,jdbcType=VARCHAR}, #{stacktrace,jdbcType=VARCHAR}, 
+      #{action,jdbcType=VARCHAR}, #{errorclass,jdbcType=VARCHAR}, #{intime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.SysErrorlog" >
+    insert into SYS_ERRORLOG
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userid != null" >
+        USERID,
+      </if>
+      <if test="ip != null" >
+        IP,
+      </if>
+      <if test="browser != null" >
+        BROWSER,
+      </if>
+      <if test="message != null" >
+        MESSAGE,
+      </if>
+      <if test="stacktrace != null" >
+        STACKTRACE,
+      </if>
+      <if test="action != null" >
+        ACTION,
+      </if>
+      <if test="errorclass != null" >
+        ERRORCLASS,
+      </if>
+      <if test="intime != null" >
+        INTIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userid != null" >
+        #{userid,jdbcType=DECIMAL},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="browser != null" >
+        #{browser,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null" >
+        #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="stacktrace != null" >
+        #{stacktrace,jdbcType=VARCHAR},
+      </if>
+      <if test="action != null" >
+        #{action,jdbcType=VARCHAR},
+      </if>
+      <if test="errorclass != null" >
+        #{errorclass,jdbcType=VARCHAR},
+      </if>
+      <if test="intime != null" >
+        #{intime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.SysErrorlog" >
+    update SYS_ERRORLOG
+    <set >
+      <if test="userid != null" >
+        USERID = #{userid,jdbcType=DECIMAL},
+      </if>
+      <if test="ip != null" >
+        IP = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="browser != null" >
+        BROWSER = #{browser,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null" >
+        MESSAGE = #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="stacktrace != null" >
+        STACKTRACE = #{stacktrace,jdbcType=VARCHAR},
+      </if>
+      <if test="action != null" >
+        ACTION = #{action,jdbcType=VARCHAR},
+      </if>
+      <if test="errorclass != null" >
+        ERRORCLASS = #{errorclass,jdbcType=VARCHAR},
+      </if>
+      <if test="intime != null" >
+        INTIME = #{intime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where LOGID = #{logid,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.SysErrorlog" >
+    update SYS_ERRORLOG
+    set USERID = #{userid,jdbcType=DECIMAL},
+      IP = #{ip,jdbcType=VARCHAR},
+      BROWSER = #{browser,jdbcType=VARCHAR},
+      MESSAGE = #{message,jdbcType=VARCHAR},
+      STACKTRACE = #{stacktrace,jdbcType=VARCHAR},
+      ACTION = #{action,jdbcType=VARCHAR},
+      ERRORCLASS = #{errorclass,jdbcType=VARCHAR},
+      INTIME = #{intime,jdbcType=TIMESTAMP}
+    where LOGID = #{logid,jdbcType=DECIMAL}
+  </update>
+</mapper>

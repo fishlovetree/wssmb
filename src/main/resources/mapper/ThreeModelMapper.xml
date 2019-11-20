@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.ThreeModelMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.ThreeModel" >
+    <id column="MODELCODE" property="modelcode" jdbcType="VARCHAR" />
+    <result column="MODELNAME" property="modelname" jdbcType="VARCHAR" />
+    <result column="MODELURL" property="modelurl" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="POSITION" property="position" jdbcType="VARCHAR" />
+    <result column="ROTATION" property="rotation" jdbcType="VARCHAR" />
+    <result column="LABEL" property="label" jdbcType="VARCHAR" />
+    <result column="MODELTYPE" property="modeltype" jdbcType="DECIMAL" />
+    <result column="CAMERAPOSITION" property="cameraposition" jdbcType="VARCHAR" />
+    <result column="CAMERATARGET" property="cameratarget" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    MODELCODE, MODELNAME, MODELURL, STATUS, POSITION, ROTATION, LABEL, MODELTYPE, CAMERAPOSITION, CAMERATARGET
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_MODEL
+    where MODELCODE = #{modelcode,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from SYS_MODEL
+    where MODELCODE = #{modelcode,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.ThreeModel" >
+    insert into SYS_MODEL (MODELCODE, MODELNAME, MODELURL, 
+      STATUS, POSITION, ROTATION, 
+      LABEL, MODELTYPE)
+    values (#{modelcode,jdbcType=VARCHAR}, #{modelname,jdbcType=VARCHAR}, #{modelurl,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{position,jdbcType=VARCHAR}, #{rotation,jdbcType=VARCHAR}, 
+      #{label,jdbcType=VARCHAR}, #{modeltype,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.ThreeModel" >
+    insert into SYS_MODEL
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="modelcode != null" >
+        MODELCODE,
+      </if>
+      <if test="modelname != null" >
+        MODELNAME,
+      </if>
+      <if test="modelurl != null" >
+        MODELURL,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="position != null" >
+        POSITION,
+      </if>
+      <if test="rotation != null" >
+        ROTATION,
+      </if>
+      <if test="label != null" >
+        LABEL,
+      </if>
+      <if test="modeltype != null" >
+        MODELTYPE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="modelcode != null" >
+        #{modelcode,jdbcType=VARCHAR},
+      </if>
+      <if test="modelname != null" >
+        #{modelname,jdbcType=VARCHAR},
+      </if>
+      <if test="modelurl != null" >
+        #{modelurl,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="position != null" >
+        #{position,jdbcType=VARCHAR},
+      </if>
+      <if test="rotation != null" >
+        #{rotation,jdbcType=VARCHAR},
+      </if>
+      <if test="label != null" >
+        #{label,jdbcType=VARCHAR},
+      </if>
+      <if test="modeltype != null" >
+        #{modeltype,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.ThreeModel" >
+    update SYS_MODEL
+    <set >
+      <if test="modelname != null" >
+        MODELNAME = #{modelname,jdbcType=VARCHAR},
+      </if>
+      <if test="modelurl != null" >
+        MODELURL = #{modelurl,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="position != null" >
+        POSITION = #{position,jdbcType=VARCHAR},
+      </if>
+      <if test="rotation != null" >
+        ROTATION = #{rotation,jdbcType=VARCHAR},
+      </if>
+      <if test="label != null" >
+        LABEL = #{label,jdbcType=VARCHAR},
+      </if>
+      <if test="modeltype != null" >
+        MODELTYPE = #{modeltype,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where MODELCODE = #{modelcode,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.ThreeModel" >
+    update SYS_MODEL
+    set MODELNAME = #{modelname,jdbcType=VARCHAR},
+      MODELURL = #{modelurl,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      POSITION = #{position,jdbcType=VARCHAR},
+      ROTATION = #{rotation,jdbcType=VARCHAR},
+      LABEL = #{label,jdbcType=VARCHAR},
+      MODELTYPE = #{modeltype,jdbcType=DECIMAL}
+    where MODELCODE = #{modelcode,jdbcType=VARCHAR}
+  </update>
+  <select id="selectList" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_MODEL
+    where STATUS = 1 order by MODELCODE
+  </select>
+</mapper>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.AmmeterStatusMapper">
+
+	<resultMap id="BaseResultMap" type="com.ssm.wssmb.model.AmmeterStatus">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="ammeterCode" property="ammeterCode" jdbcType="VARCHAR" />
+		<result column="ammeterName" property="ammeterName" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="lastFreezeTime" property="lastFreezeTime" jdbcType="VARCHAR" />
+		<result column="lastEarlyWarnTime" property="lastEarlyWarnTime" jdbcType="VARCHAR" />
+		<result column="lastFaultTime" property="lastFaultTime" jdbcType="VARCHAR" />
+		<result column="installAddress" property="installAddress" jdbcType="VARCHAR" />
+		<result column="concentratorName" property="concentratorName" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="location" property="location" jdbcType="VARCHAR" />
+		<result column="onlineTime" property="onlineTime" jdbcType="VARCHAR" />
+		<result column="offlineTime" property="offlineTime" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<!-- 电表 -->
+	<select id="getAllAmmeter" resultMap="BaseResultMap">
+	SELECT a.id,a.ammeterCode,a.ammeterName,a.installAddress,c.concentratorName FROM mb_ammeter a,mb_concentrator c
+	  where a.concentratorCode=c.concentratorId and IS_PARENT_ORGANIZATION(a.organizationCode,#{orgId,jdbcType=INTEGER})=1
+	</select>
+	
+	<select id="getAmmeterByRegion" resultMap="BaseResultMap">
+	SELECT a.id,a.ammeterCode,a.ammeterName,a.installAddress,c.concentratorName FROM mb_ammeter a,mb_concentrator c
+	  where a.concentratorCode=c.concentratorId and IS_PARENT_REGION(c.region,#{id,jdbcType=INTEGER})=1 
+	  and IS_PARENT_ORGANIZATION(a.organizationCode,#{orgId,jdbcType=INTEGER})=1
+	</select>
+	
+	<select id="getAmmeterStatusById" resultMap="BaseResultMap">
+	SELECT a.id,a.ammeterCode,a.ammeterName,a.installAddress,c.concentratorName FROM mb_ammeter a,mb_concentrator c
+         <choose>
+         <when test="type==1">
+         where IS_PARENT_ORGANIZATION(a.organizationCode,#{id,jdbcType=INTEGER})=1
+         and a.concentratorCode=c.concentratorId
+         </when>
+         <when test="type==3">
+         where a.boxCode = #{id,jdbcType=INTEGER}
+         and a.concentratorCode=c.concentratorId
+         </when>
+         <when test="type==4">
+         where a.concentratorCode = #{id,jdbcType=INTEGER}
+         and a.concentratorCode=c.concentratorId
+         </when>
+         <when test="type==6">
+         where a.id = #{id,jdbcType=INTEGER}
+         and a.concentratorCode=c.concentratorId
+         </when>
+         </choose>
+         order by a.id asc
+	</select>
+	
+	<select id="getLastFreezeTimeByAmmeterId" resultType="String">
+	SELECT freezetime FROM bus_freezedata_rtele  WHERE equipmentaddress=#{address,jdbcType=VARCHAR}
+	and EQUIPMENTTYPE = 3
+	order by freezetime desc
+	limit 1
+	</select>
+	
+	<select id="getLastEarlyWarnTimeByAmmeterId" resultType="String">
+	SELECT  e.occurTime as lastEarlyWarnTime from mb_ammeter a,bus_earlywarning e
+	where a.id=e.equipId and e.type=3 and a.id=#{id,jdbcType=INTEGER}
+	order by e.occurTime desc 
+	limit 1
+	</select>
+	
+	<select id="getLastFaultTimeByAmmeterId" resultType="String">
+	SELECT  f.occurTime as lastFaultTime from mb_ammeter a,bus_fault f
+	where a.id=f.equipId and f.type=3 and a.id=#{id,jdbcType=INTEGER}
+	order by f.occurTime desc 
+	limit 1
+	</select>
+	
+	<!-- 终端 -->
+	<select id="getAllTerminal" resultMap="BaseResultMap">
+	SELECT t.terminalId as id,t.address as ammeterCode,t.terminalName as ammeterName,t.installationLocation as 
+	installAddress,c.concentratorName FROM mb_terminal t,mb_concentrator c
+	  where t.concentratorId = c.concentratorId and IS_PARENT_ORGANIZATION(t.organizationId,#{orgId,jdbcType=INTEGER})=1
+	</select>
+	
+	<select id="getTerminalByRegion" resultMap="BaseResultMap">
+	SELECT t.terminalId as id,t.address as ammeterCode,t.terminalName as ammeterName,t.installationLocation as 
+	installAddress,c.concentratorName FROM mb_terminal t,mb_concentrator c
+	  where t.concentratorId=c.concentratorId and IS_PARENT_REGION(c.region,#{id,jdbcType=INTEGER})=1
+	   and IS_PARENT_ORGANIZATION(t.organizationId,#{orgId,jdbcType=INTEGER})=1
+	</select>
+	
+	<select id="getTerminalStatusById" resultMap="BaseResultMap">
+	SELECT t.terminalId as id,t.address as ammeterCode,t.terminalName as ammeterName,t.installationLocation as 
+	installAddress,c.concentratorName FROM mb_terminal t,mb_concentrator c
+         <choose>
+         <when test="type==1">
+         where IS_PARENT_ORGANIZATION(t.organizationId,#{id,jdbcType=INTEGER})=1
+         and t.concentratorId=c.concentratorId
+         </when>
+         <when test="type==3">
+         where t.measureId = #{id,jdbcType=INTEGER}
+         and t.concentratorId=c.concentratorId
+         </when>
+         <when test="type==4">
+         where t.concentratorId = #{id,jdbcType=INTEGER}
+         and t.concentratorId=c.concentratorId
+         </when>
+         <when test="type==5">
+         where t.terminalId = #{id,jdbcType=INTEGER}
+         and t.concentratorId=c.concentratorId
+         </when>
+         </choose>
+	</select>
+	
+	<select id="getLastFreezeTimeByTerminalId" resultType="String">
+	SELECT freezetime FROM bus_freezedata_rtele  WHERE equipmentaddress=#{address,jdbcType=VARCHAR}
+	and EQUIPMENTTYPE = 2
+	order by freezetime desc
+	limit 1
+	</select>
+	
+	<select id="getLastEarlyWarnTimeByTerminalId" resultType="String">
+	SELECT  e.occurTime as lastEarlyWarnTime from mb_terminal t,bus_earlywarning e
+	where t.terminalId=e.equipId and e.type=3 and t.terminalId=#{id,jdbcType=INTEGER}
+	order by e.occurTime desc 
+	limit 1
+	</select>
+	
+	<select id="getLastFaultTimeByTerminalId" resultType="String">
+	SELECT  f.occurTime as lastFaultTime from mb_terminal t,bus_fault f
+	where t.terminalId=f.equipId and f.type=3 and t.terminalId=#{id,jdbcType=INTEGER}
+	order by f.occurTime desc 
+	limit 1
+	</select>
+	
+	<!-- 集中器 -->
+	<select id="getAllConcentrator" resultMap="BaseResultMap">
+	SELECT c.concentratorId as id,c.concentratorName,c.address as ammeterCode,m.Address,concat(m.longitude,',',latitude)as location 
+	FROM mb_concentrator c,mb_measurefile m
+	  where m.MeasureId = c.measureId and IS_PARENT_ORGANIZATION(c.organizationId,#{orgId,jdbcType=INTEGER})=1
+	</select>
+	
+	<select id="getOnlineTimeByConcentratorId" resultMap="BaseResultMap">
+	select u.onlineTime,u.droppedTime as offTime,u.status from bus_unitonline u
+	where u.type=1 and u.equipId=#{id,jdbcType=INTEGER} 
+	order by u.onlineTime desc
+	limit 1
+	</select>
+	
+	<select id="getConcentratorStatusById" resultMap="BaseResultMap">
+	SELECT c.concentratorId as id,c.concentratorName,c.address as ammeterCode,m.Address,concat(m.longitude,',',latitude)as location 
+	FROM mb_concentrator c,mb_measurefile m
+         <choose>
+         <when test="type==1">
+      where    m.MeasureId = c.measureId
+       and  IS_PARENT_ORGANIZATION(c.organizationId,#{id,jdbcType=INTEGER})=1
+         </when>
+         <when test="type==3">
+         where  m.MeasureId = c.measureId 
+         and c.measureId = #{id,jdbcType=INTEGER}  
+         </when>
+         <when test="type==4">
+         where m.MeasureId = c.measureId  
+         and c.concentratorId=#{id,jdbcType=INTEGER}
+         </when>       
+         </choose>     
+	</select>
+	
+	<select id="getConcentratorByRegion" resultMap="BaseResultMap">
+	SELECT c.concentratorId as id,c.concentratorName,c.address as ammeterCode,m.Address,concat(m.longitude,',',latitude)as location 
+	FROM mb_concentrator c,mb_measurefile m
+	  where m.MeasureId = c.measureId and IS_PARENT_ORGANIZATION(c.organizationId,#{orgId,jdbcType=INTEGER})=1
+	  and IS_PARENT_REGION(c.region,#{id,jdbcType=INTEGER})=1
+	</select>
+	
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.EarlyWarnAnnexMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.EarlyWarnAnnex" >
+    <id column="ANNEXID" property="annexid" jdbcType="DECIMAL" />
+    <result column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="ANNEXNAME" property="annexname" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.ssm.wssmb.model.EarlyWarnAnnex" extends="BaseResultMap" >
+    <result column="ANNEX" property="annex" jdbcType="BLOB" />
+  </resultMap>
+  
+ 
+  <sql id="Base_Column_List" >
+    ANNEXID, ID, ANNEXNAME
+  </sql>
+  <sql id="Blob_Column_List" >
+    ANNEX
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from BUS_EARLYWARNINGANNEX
+    where ANNEXID = #{annexid,jdbcType=DECIMAL}
+  </select>
+  
+  <!-- 通过预警id获取附件 -->
+  <select id="selectByEarlyId" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from BUS_EARLYWARNINGANNEX
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from BUS_EARLYWARNINGANNEX
+    where ANNEXID = #{annexid,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.EarlyWarnAnnex" >
+    insert into bus_earlywarningannex ( ID, ANNEXNAME, 
+      ANNEX)
+    values (#{id,jdbcType=INTEGER}, #{annexname,jdbcType=VARCHAR}, 
+      #{annex,jdbcType=BLOB})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.EarlyWarnAnnex" >
+    insert into BUS_EARLYWARNINGANNEX
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="annexid != null" >
+        ANNEXID,
+      </if>
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="annexname != null" >
+        ANNEXNAME,
+      </if>
+      <if test="annex != null" >
+        ANNEX,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="annexid != null" >
+        #{annexid,jdbcType=DECIMAL},
+      </if>
+      <if test="id != null" >
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="annexname != null" >
+        #{annexname,jdbcType=VARCHAR},
+      </if>
+      <if test="annex != null" >
+        #{annex,jdbcType=BLOB},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.EarlyWarnAnnex" >
+    update BUS_EARLYWARNINGANNEX
+    <set >
+      <if test="id != null" >
+        ID = #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="annexname != null" >
+        ANNEXNAME = #{annexname,jdbcType=VARCHAR},
+      </if>
+      <if test="annex != null" >
+        ANNEX = #{annex,jdbcType=BLOB},
+      </if>
+    </set>
+    where ANNEXID = #{annexid,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ssm.wssmb.model.EarlyWarnAnnex" >
+    update BUS_EARLYWARNINGANNEX
+    set ID = #{id,jdbcType=DECIMAL},
+      ANNEXNAME = #{annexname,jdbcType=VARCHAR},
+      ANNEX = #{annex,jdbcType=BLOB}
+    where ANNEXID = #{annexid,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.EarlyWarnAnnex" >
+    update BUS_EARLYWARNINGANNEX
+    set ID = #{id,jdbcType=DECIMAL},
+      ANNEXNAME = #{annexname,jdbcType=VARCHAR}
+    where ANNEXID = #{annexid,jdbcType=DECIMAL}
+  </update>
+</mapper>

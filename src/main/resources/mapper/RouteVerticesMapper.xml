@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.RouteVerticesMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.RouteVertices" >
+    <result column="POINTNUM" property="pointnum" jdbcType="DECIMAL" />
+    <result column="POINTNAME" property="pointname" jdbcType="VARCHAR" />
+    <result column="COORDINATE" property="coordinate" jdbcType="VARCHAR" />
+    <result column="ISEXIT" property="isexit" jdbcType="DECIMAL" />
+    <result column="BUILDINGID" property="buildingid" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+  </resultMap>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.RouteVertices" >
+    insert into BUS_ROUTEVERTICES (POINTNUM, POINTNAME, COORDINATE, 
+      ISEXIT, BUILDINGID, STATUS
+      )
+    values (#{pointnum,jdbcType=DECIMAL}, #{pointname,jdbcType=VARCHAR}, #{coordinate,jdbcType=VARCHAR}, 
+      #{isexit,jdbcType=DECIMAL}, #{buildingid,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.RouteVertices" >
+    insert into BUS_ROUTEVERTICES
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="pointnum != null" >
+        POINTNUM,
+      </if>
+      <if test="pointname != null" >
+        POINTNAME,
+      </if>
+      <if test="coordinate != null" >
+        COORDINATE,
+      </if>
+      <if test="isexit != null" >
+        ISEXIT,
+      </if>
+      <if test="buildingid != null" >
+        BUILDINGID,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="pointnum != null" >
+        #{pointnum,jdbcType=DECIMAL},
+      </if>
+      <if test="pointname != null" >
+        #{pointname,jdbcType=VARCHAR},
+      </if>
+      <if test="coordinate != null" >
+        #{coordinate,jdbcType=VARCHAR},
+      </if>
+      <if test="isexit != null" >
+        #{isexit,jdbcType=DECIMAL},
+      </if>
+      <if test="buildingid != null" >
+        #{buildingid,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+</mapper>

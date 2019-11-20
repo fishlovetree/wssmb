@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.wssmb.mapper.MbAieLockMapper">
+	<resultMap
+		id="BaseResultMap"
+		type="com.ssm.wssmb.model.MbAieLock">
+		<id
+			column="id"
+			property="id"
+			jdbcType="DECIMAL" />
+		<result
+			column="lockName"
+			property="lockName"
+			jdbcType="VARCHAR" />
+		<result
+			column="boxCode"
+			property="boxCode"
+			jdbcType="VARCHAR" />
+		<result
+			column="lockCode"
+			property="lockCode"
+			jdbcType="VARCHAR" />
+		<result
+			column="organizationCode"
+			property="organizationCode"
+			jdbcType="VARCHAR" />
+		<result
+			column="produce"
+			property="produce"
+			jdbcType="VARCHAR" />
+		<result
+			column="produceTime"
+			property="produceTime"
+			jdbcType="VARCHAR" />
+		<result
+			column="createPerson"
+			property="createPerson"
+			jdbcType="VARCHAR" />
+		<result
+			column="createTime"
+			property="createTime"
+			jdbcType="VARCHAR" />
+		<result
+			column="lockType"
+			property="lockType"
+			jdbcType="VARCHAR" />
+		<result
+			column="apikey"
+			property="apikey"
+			jdbcType="VARCHAR" />
+		<result
+			column="imei"
+			property="imei"
+			jdbcType="VARCHAR" />
+		<result
+			column="imsi"
+			property="imsi"
+			jdbcType="VARCHAR" />
+		<result
+			column="serialnumber"
+			property="serialnumber"
+			jdbcType="VARCHAR" />
+		<result
+			column="password"
+			property="password"
+			jdbcType="VARCHAR" />
+		<result
+			column="mac"
+			property="mac"
+			jdbcType="VARCHAR" />
+		<result
+			column="openStatus"
+			property="openStatus"
+			jdbcType="DECIMAL" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, lockName, boxCode, lockCode, organizationCode, produce, produceTime,
+		createPerson,
+		createTime,lockType,apikey,imei,imsi,serialnumber,password,mac,openStatus
+	</sql>
+
+	<select
+		id="selectAll"
+		resultType="com.ssm.wssmb.model.MbAieLock">
+		select * from mb_aielock where 1=1
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+		limit #{startin,jdbcType=DECIMAL},#{endindex,jdbcType=DECIMAL}
+	</select>
+
+	<insert
+		id="addAieLock"
+		parameterType="com.ssm.wssmb.model.MbAieLock">
+		insert into mb_aielock (lockname,boxCode,
+		lockCode,organizationCode,produce,produceTime,
+		createPerson,createTime,lockType,apikey,imei,imsi,serialnumber,password,mac)
+		values (
+		#{lockName,jdbcType=VARCHAR},
+		#{boxCode,jdbcType=VARCHAR},
+		#{lockCode,jdbcType=VARCHAR},
+		#{organizationCode,jdbcType=VARCHAR},
+		#{produce,jdbcType=VARCHAR},
+		#{produceTime,jdbcType=VARCHAR},
+		#{createPerson,jdbcType=VARCHAR},
+		#{createTime,jdbcType=VARCHAR},
+		#{lockType,jdbcType=VARCHAR},
+		#{apikey,jdbcType=VARCHAR},
+		#{imei,jdbcType=VARCHAR},
+		#{imsi,jdbcType=VARCHAR},
+		#{serialnumber,jdbcType=VARCHAR},
+		#{password,jdbcType=VARCHAR},
+		#{mac,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<insert
+		id="addOneAieLock"
+		parameterType="com.ssm.wssmb.model.MbAieLock">
+		insert into mb_aielock (lockName,boxCode, lockCode,
+		organizationCode,produce,produceTime,createPerson,
+		createTime,lockType,apikey,imei,imsi,serialnumber,password,mac)
+		values (
+		#{lockName,jdbcType=VARCHAR},
+		#{boxCode,jdbcType=VARCHAR},
+		#{lockCode,jdbcType=VARCHAR},
+		#{organizationCode,jdbcType=VARCHAR},
+		#{produce,jdbcType=VARCHAR},
+		#{produceTime,jdbcType=VARCHAR},
+		#{createPerson,jdbcType=VARCHAR},
+		#{createTime,jdbcType=VARCHAR},
+		#{lockType,jdbcType=VARCHAR},
+		#{apikey,jdbcType=VARCHAR},
+		#{imei,jdbcType=VARCHAR},
+		#{imsi,jdbcType=VARCHAR},
+		#{serialnumber,jdbcType=VARCHAR},
+		#{password,jdbcType=VARCHAR},
+		#{mac,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<update
+		id="editAieLock"
+		parameterType="com.ssm.wssmb.model.MbAieLock">
+		update mb_aielock
+		set lockName= #{lockName,jdbcType=VARCHAR},
+		boxCode= #{boxCode,jdbcType=VARCHAR},
+		lockCode=#{lockCode,jdbcType=VARCHAR},
+		organizationCode= #{organizationCode,jdbcType=VARCHAR},
+		produce=#{produce,jdbcType=VARCHAR},
+		produceTime=#{produceTime,jdbcType=VARCHAR},
+		lockType= #{lockType,jdbcType=VARCHAR},
+		apikey= #{apikey,jdbcType=VARCHAR},
+		imei= #{imei,jdbcType=VARCHAR},
+		imsi=#{imsi,jdbcType=VARCHAR},
+		serialnumber= #{serialnumber,jdbcType=VARCHAR},
+		password= #{password,jdbcType=VARCHAR},
+		mac= #{mac,jdbcType=VARCHAR}
+		where id=#{id,jdbcType=DECIMAL}
+	</update>
+
+	<delete
+		id="deleteAieLock"
+		parameterType="java.lang.Integer">
+		delete from mb_aielock
+		where id = #{id,jdbcType=DECIMAL}
+	</delete>
+
+
+	<select
+		id="queryAieLockByBoxCode"
+		resultType="com.ssm.wssmb.model.MbAieLock">
+		SELECT
+		*
+		FROM
+		mb_aielock AS ma
+		INNER JOIN mb_measurefile AS mm ON ma.boxCode = mm.MeasureId
+		<if test="inputValue != null and inputValue != ''">
+			AND mm.MeasureName LIKE #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(ma.organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+		limit #{startin,jdbcType=DECIMAL},#{endindex,jdbcType=DECIMAL}
+	</select>
+
+	<select
+		id="queryAieLockByLockCode"
+		resultType="com.ssm.wssmb.model.MbAieLock">
+		select * from mb_aielock where 1=1
+		<if test="inputValue != null and inputValue != ''">
+			and lockCode like #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+		limit #{startin,jdbcType=DECIMAL},#{endindex,jdbcType=DECIMAL}
+	</select>
+
+
+	<select
+		id="queryTotal"
+		resultType="java.lang.Integer">
+		select id from mb_aielock where 1=1
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+	</select>
+
+	<select
+		id="queryTotalByBox"
+		parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		SELECT
+		id
+		FROM
+		mb_aielock AS ma
+		INNER JOIN mb_measurefile AS mm ON ma.boxCode = mm.MeasureId
+		<if test="inputValue != null and inputValue != ''">
+			AND mm.MeasureName LIKE #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(ma.organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+	</select>
+
+	<select
+		id="queryTotalByLock"
+		parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		select id from mb_aielock where 1=1
+		<if test="inputValue != null and inputValue != ''">
+			and lockCode like #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+	</select>
+	
+	<select
+		id="getAieLockByBoxCode"
+		resultType="com.ssm.wssmb.model.MbAieLock">
+		select * from mb_aielock where 1=1
+		and boxCode = #{measureId,jdbcType=DECIMAL}
+	</select>	
+	
+	<select
+		id="getLockByName"
+		resultType="com.ssm.wssmb.model.MbAieLock">
+		select * from mb_aielock where lockName = #{lockName,jdbcType=VARCHAR}
+	</select>
+	
+	<select
+		id="getLockByNameAndId"
+		resultType="com.ssm.wssmb.model.MbAieLock">
+		select * from mb_aielock where lockName = #{lockName,jdbcType=VARCHAR} and id!= #{id,jdbcType=VARCHAR}
+	</select>
+	
+	<select
+		id="getLockByMac"
+		resultType="com.ssm.wssmb.model.MbAieLock">
+		select * from mb_aielock where mac = #{mac,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 更改e锁开关状态 -->
+	<update id="changeOpenStatus">
+	    update mb_aielock set openStatus = #{openStatus,jdbcType=INTEGER} where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.MeasureFileMapper">
+	<resultMap id="BaseResultMap"
+		type="com.ssm.wssmb.model.MeasureFile">
+		<result column="MeasureId" property="MeasureId"
+			jdbcType="INTEGER" />
+		<result column="MeasureName" property="MeasureName"
+			jdbcType="VARCHAR" />
+		<result column="MeasureNumber" property="MeasureNumber"
+			jdbcType="VARCHAR" />
+		<result column="Address" property="Address" jdbcType="VARCHAR" />
+		<result column="longitude" property="longitude"
+			jdbcType="VARCHAR" />
+		<result column="latitude" property="latitude"
+			jdbcType="VARCHAR" />
+		<result column="OrganizationId" property="OrganizationId"
+			jdbcType="INTEGER" />
+		<result column="Manufacturer" property="Manufacturer"
+			jdbcType="VARCHAR" />
+		<result column="ProduceDate" property="ProduceDate"
+			jdbcType="TIMESTAMP" />
+		<result column="Creater" property="Creater" jdbcType="VARCHAR" />
+		<result column="CreateDate" property="CreateDate"
+			jdbcType="TIMESTAMP" />
+		<result column="Region" property="Region" jdbcType="INTEGER" />
+		<result column="openStatus" property="openStatus"
+			jdbcType="INTEGER" />
+		<association property="organization"
+			javaType="com.ssm.wssmb.model.Organization">
+			<result property="organizationname" column="ORGANIZATIONNAME"
+				jdbcType="VARCHAR" />
+		</association>
+		<association property="area"
+			javaType="com.ssm.wssmb.model.sysarea">
+			<result property="Name" column="NAME" jdbcType="VARCHAR" />
+			<result property="leveltype" column="LEVELTYPE"
+				jdbcType="INTEGER" />
+		</association>
+	</resultMap>
+
+
+
+	<select id="selectList" resultMap="BaseResultMap">
+		select
+		a.MeasureId,a.MeasureName,a.MeasureNumber,a.longitude,a.latitude,a.Address,a.OrganizationId,
+		a.Manufacturer,a.ProduceDate,a.Creater,a.CreateDate,a.Region,b.ORGANIZATIONNAME,c.NAME
+		as Name,c.LEVELTYPE,a.openStatus
+		from mb_measurefile a,sys_organization
+		b,sys_area c
+		where a.OrganizationId=b.ORGANIZATIONID and a.region=c.ID
+		and
+		IS_PARENT_ORGANIZATION(a.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		order by MeasureId asc
+	</select>
+
+	<select id="organizationClickTreeList" resultMap="BaseResultMap">
+		select
+		a.MeasureId,a.MeasureName,a.MeasureNumber,a.longitude,a.latitude,a.Address,a.OrganizationId,
+		a.Manufacturer,a.ProduceDate,a.Creater,a.CreateDate,a.Region,b.ORGANIZATIONNAME,c.NAME
+		as Name,c.LEVELTYPE,a.openStatus
+		from mb_measurefile a,sys_organization
+		b,sys_area c
+		where a.OrganizationId=b.ORGANIZATIONID and a.region=c.ID
+		and
+		IS_PARENT_ORGANIZATION(a.OrganizationId,#{id,jdbcType=INTEGER})=1
+		<if test="name != null and name != ''">
+			and a.MeasureName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="number != null and number != ''">
+			and a.MeasureNumber like
+			concat(concat('%',#{number,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.Address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by MeasureId asc
+	</select>
+
+	<select id="regionClickTreeList" resultMap="BaseResultMap">
+		select
+		gg.id as
+		reig,a.MeasureId,a.MeasureName,a.MeasureNumber,a.longitude,a.latitude,a.Address,a.OrganizationId,
+		a.Manufacturer,a.ProduceDate,a.Creater,a.CreateDate,a.Region,b.ORGANIZATIONNAME,c.NAME
+		as Name,c.LEVELTYPE,a.openStatus
+		from mb_measurefile a,sys_organization
+		b,sys_area
+		c,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		where
+		a.OrganizationId=b.ORGANIZATIONID
+		and a.region=c.ID
+		AND a.Region=gg.id
+		order by MeasureId asc
+	</select>
+	
+	<select id="regionClickTreeLists" resultMap="BaseResultMap">
+		select
+		gg.id as
+		reig,a.MeasureId,a.MeasureName,a.MeasureNumber,a.longitude,a.latitude,a.Address,a.OrganizationId,
+		a.Manufacturer,a.ProduceDate,a.Creater,a.CreateDate,a.Region,b.ORGANIZATIONNAME,c.NAME
+		as Name,c.LEVELTYPE,a.openStatus
+		from mb_measurefile a,sys_organization
+		b,sys_area
+		c,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		where
+		a.OrganizationId=b.ORGANIZATIONID
+		and a.region=c.ID
+		AND a.Region=gg.id
+		<if test="name != null and name != ''">
+			and a.MeasureName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="number != null and number != ''">
+			and a.MeasureNumber like
+			concat(concat('%',#{number,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.Address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+		order by MeasureId asc
+	</select>
+
+	<select id="selectCount" resultType="java.lang.Integer">
+		select
+		count(0)
+		from
+		mb_measurefile where MeasureId =
+		#{MeasureId,jdbcType=INTEGER}
+	</select>
+	<update id="update"
+		parameterType="com.ssm.wssmb.model.MeasureFile">
+		update mb_measurefile
+		<set>
+			<if test="MeasureName != null">
+				MeasureName = #{MeasureName,jdbcType=VARCHAR},
+			</if>
+			<if test="MeasureNumber != null">
+				MeasureNumber = #{MeasureNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="longitude != null">
+				longitude = #{longitude,jdbcType=VARCHAR},
+			</if>
+			<if test="latitude != null">
+				latitude = #{latitude,jdbcType=VARCHAR},
+			</if>
+			<if test="Address != null">
+				Address = #{Address,jdbcType=VARCHAR},
+			</if>
+			<if test="OrganizationId != null">
+				OrganizationId=#{OrganizationId,jdbcType=VARCHAR},
+			</if>
+			<if test="Region != null">
+				Region = #{Region,jdbcType=INTEGER},
+			</if>
+			<if test="Manufacturer != null">
+				Manufacturer = #{Manufacturer,jdbcType=VARCHAR},
+			</if>
+			<if test="ProduceDate != null">
+				ProduceDate = #{ProduceDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="Creater != null">
+				Creater = #{Creater,jdbcType=VARCHAR},
+			</if>
+			<if test="CreateDate != null">
+				CreateDate = #{CreateDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="Region != null">
+				Region = #{Region,jdbcType=INTEGER},
+			</if>
+		</set>
+		where MeasureId = #{MeasureId,jdbcType=INTEGER}
+	</update>
+
+	<insert id="insert"
+		parameterType="com.ssm.wssmb.model.MeasureFile">
+		insert into mb_measurefile
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="MeasureName != null">
+				MeasureName,
+			</if>
+			<if test="MeasureNumber != null">
+				MeasureNumber,
+			</if>
+			<if test="Address != null">
+				Address,
+			</if>
+			<if test="longitude != null">
+				longitude,
+			</if>
+			<if test="latitude != null">
+				latitude,
+			</if>
+			<if test="OrganizationId != null">
+				OrganizationId,
+			</if>
+			<if test="Manufacturer != null">
+				Manufacturer,
+			</if>
+			<if test="ProduceDate != null">
+				ProduceDate,
+			</if>
+			<if test="Creater != null">
+				Creater,
+			</if>
+			<if test="CreateDate != null">
+				CreateDate,
+			</if>
+			<if test="Region != null">
+				Region,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="MeasureName != null">
+				#{MeasureName,jdbcType=VARCHAR},
+			</if>
+			<if test="MeasureNumber != null">
+				#{MeasureNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="Address != null">
+				#{Address,jdbcType=VARCHAR},
+			</if>
+			<if test="longitude != null">
+				#{longitude,jdbcType=VARCHAR},
+			</if>
+			<if test="latitude != null">
+				#{latitude,jdbcType=VARCHAR},
+			</if>
+			<if test="OrganizationId != null">
+				#{OrganizationId,jdbcType=INTEGER},
+			</if>
+			<if test="Manufacturer != null">
+				#{Manufacturer,jdbcType=VARCHAR},
+			</if>
+			<if test="ProduceDate != null">
+				#{ProduceDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="Creater != null">
+				#{Creater,jdbcType=VARCHAR},
+			</if>
+			<if test="CreateDate != null">
+				#{CreateDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="Region != null">
+				#{Region,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+
+	<select id="getOrganizationId" resultType="Integer"
+		parameterType="String">
+		select ORGANIZATIONID from sys_organization
+		where
+		ORGANIZATIONNAME=#{organizationName,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="delete"
+		parameterType="com.ssm.wssmb.model.MeasureFile">
+		delete from mb_measurefile
+		where MeasureId =
+		#{MeasureId,jdbcType=INTEGER} and MeasureNumber =
+		#{MeasureNumber,jdbcType=VARCHAR}
+	</delete>
+
+	<select id="searchInf" resultMap="BaseResultMap">
+		SELECT
+		a.MeasureId,a.MeasureName,a.MeasureNumber,a.Address,a.latitude,a.longitude,a.OrganizationId,
+		a.Manufacturer,a.ProduceDate,a.Creater,a.CreateDate,a.Region,b.ORGANIZATIONNAME,c.NAME
+		AS NAME,c.LEVELTYPE,a.openStatus
+		FROM mb_measurefile a,sys_organization
+		b,sys_area c
+		WHERE a.OrganizationId=b.ORGANIZATIONID AND a.region=c.ID
+		and
+		IS_PARENT_ORGANIZATION(a.OrganizationId,#{organizationId,jdbcType=INTEGER})=1
+		<if test=" MeasureName != null and MeasureName !=''">
+			and MeasureName like CONCAT(CONCAT('%',
+			#{MeasureName,jdbcType=VARCHAR}), '%')
+		</if>
+		<if test=" MeasureNumber != null and MeasureNumber !=''">
+			and MeasureNumber like CONCAT(CONCAT('%',
+			#{MeasureNumber,jdbcType=VARCHAR}), '%')
+		</if>
+		<if test=" Address != null and Address !=''">
+			and Address like CONCAT(CONCAT('%',
+			#{Address,jdbcType=VARCHAR}), '%')
+		</if>
+		order by MeasureId desc
+		limit #{startindex,jdbcType=INTEGER} ,
+		#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getMeasureFileCount" resultType="Integer">
+		SELECT count(0)
+		FROM mb_measurefile a,sys_organization b,sys_area c
+		WHERE a.OrganizationId=b.ORGANIZATIONID AND a.region=c.ID
+		<if test=" MeasureName != null and MeasureName !=''">
+			and MeasureName like CONCAT(CONCAT('%',
+			#{MeasureName,jdbcType=VARCHAR}), '%')
+		</if>
+		<if test=" MeasureNumber != null and MeasureNumber !=''">
+			and MeasureNumber like CONCAT(CONCAT('%',
+			#{MeasureNumber,jdbcType=VARCHAR}), '%')
+		</if>
+		<if test=" Address != null and Address !=''">
+			and Address like CONCAT(CONCAT('%',
+			#{Address,jdbcType=VARCHAR}), '%')
+		</if>
+	</select>
+
+	<select id="getMeasurefileByOrganizationId"
+		resultMap="BaseResultMap">
+		SELECT * FROM mb_measurefile WHERE
+		IS_PARENT_ORGANIZATION(OrganizationId,#{OrganizationId,jdbcType=INTEGER})=1
+	</select>
+
+	<select id="getRegionByMeasureId" resultType="Integer">
+		select a.ID from
+		sys_area a,mb_measurefile b
+		where
+		b.MeasureId=#{measureId,jdbcType=INTEGER} and a.ID=b.Region
+	</select>
+
+	<select id="getMeasureId" resultType="Integer">
+		select MeasureId from
+		mb_measurefile
+		where
+		MeasureName=#{measureName,jdbcType=VARCHAR}
+	</select>
+	<select id="getMeasurefileByMeasureId" resultMap="BaseResultMap">
+		select * from
+		mb_measurefile where
+		MeasureId=#{measureId,jdbcType=VARCHAR}
+	</select>
+
+	<select id="getCodeByName" resultType="java.lang.Integer">
+		select MeasureId from
+		mb_measurefile where
+		MeasureName=#{measureName,jdbcType=VARCHAR}
+	</select>
+
+	<select id="getMeasurefileByOrgId" resultMap="BaseResultMap">
+		SELECT * FROM
+		mb_measurefile WHERE
+		OrganizationId=#{OrganizationId,jdbcType=INTEGER}
+	</select>
+
+	<select id="getOrganizationIdByMeasureId" resultType="Integer">
+		select
+		OrganizationId from mb_measurefile
+		where
+		MeasureId=#{measureId,jdbcType=INTEGER}
+	</select>
+
+	<select id="getHistoryAlarm" resultMap="BaseResultMap">
+		SELECT * FROM
+		mb_measurefile WHERE MeasureNumber IN (
+		SELECT
+		measureAddress
+		FROM
+		bus_earlywarning
+		WHERE
+		measureAddress
+		IN(
+		SELECT
+		MeasureNumber
+		FROM
+		mb_measurefile
+		WHERE
+		organizationId IN (
+		SELECT
+		organizationid
+		FROM
+		sys_organization
+		WHERE
+		IS_PARENT_ORGANIZATION (organizationid,
+		#{orgId,jdbcType=INTEGER}) = 1
+		)) AND ISNULL(endTime)
+
+		)
+	</select>
+
+	<select id="getHistoryFault" resultMap="BaseResultMap">
+		SELECT * FROM
+		mb_measurefile WHERE MeasureNumber IN (
+		SELECT measureAddress FROM
+		bus_fault WHERE measureAddress IN (
+		SELECT MeasureNumber FROM
+		mb_measurefile WHERE OrganizationId IN (
+		SELECT
+		organizationid
+		FROM
+		sys_organization
+		WHERE
+		IS_PARENT_ORGANIZATION (organizationid,
+		#{orgId,jdbcType=INTEGER}) = 1
+		)
+		)AND ISNULL(endTime)
+		)
+	</select>
+
+	<select id="getHistoryMessage" resultMap="BaseResultMap">
+		SELECT * FROM
+		mb_measurefile WHERE MeasureNumber IN (
+		SELECT measureAddress FROM
+		bus_messagepushrecord WHERE measureAddress IN (
+		SELECT MeasureNumber
+		FROM mb_measurefile WHERE OrganizationId IN (
+		SELECT
+		organizationid
+		FROM
+		sys_organization
+		WHERE
+		IS_PARENT_ORGANIZATION (organizationid,
+		#{orgId,jdbcType=INTEGER}) = 1
+		)
+		)
+		)
+	</select>
+
+	<select id="getAllMeasureNumber" resultType="java.lang.String">
+		select MeasureNumber from mb_measurefile
+	</select>
+
+	<select id="getByIdAndType" resultMap="BaseResultMap">
+		select
+		a.MeasureId,a.MeasureName,a.MeasureNumber,a.longitude,a.latitude,a.Address,a.OrganizationId,
+		a.Manufacturer,a.ProduceDate,a.Creater,a.CreateDate,a.Region,b.ORGANIZATIONNAME,c.NAME
+		as Name,c.LEVELTYPE,a.openStatus
+		from mb_measurefile a,sys_organization
+		b,sys_area
+		c
+		where
+		a.OrganizationId=b.ORGANIZATIONID and a.region=c.ID
+		and a.MeasureId=#{id,jdbcType=INTEGER}
+		<if test="name != null and name != ''">
+			and a.MeasureName like
+			concat(concat('%',#{name,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="number != null and number != ''">
+			and a.MeasureNumber like
+			concat(concat('%',#{number,jdbcType=VARCHAR}),'%')
+		</if>
+		<if test="address != null and address != ''">
+			and a.Address like
+			concat(concat('%',#{address,jdbcType=VARCHAR}),'%')
+		</if>
+	</select>
+
+	<!-- 更改表箱门节点状态 -->
+	<update id="changeOpenStatus" parameterType="java.lang.Integer">
+		update mb_measurefile set openStatus = #{openStatus,jdbcType=INTEGER} where
+		MeasureId = #{measureId,jdbcType=INTEGER}
+	</update>
+
+</mapper>

@@ -1,0 +1,99 @@
+body{}
+.imgpanel
+{	
+	display: inline-block;
+	padding:0px;
+	left: 106px;
+   	position: relative;
+}
+.jigsaw_imgpanel div
+{
+	display: inline-block;
+	margin: 3px;
+	padding: 0px;
+	background-repeat: no-repeat;
+	transition: background-position .5s ease-out;
+}
+.imgpanel div.clearfix
+{
+	margin:0px;
+	height:1px;
+	width: 100%;
+	display: block;
+	padding:0px;
+}
+
+.code-con{
+    width: 550px;
+    left: 50%;
+    /* background-color: #fff; */
+    z-index: 100;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    margin: auto;
+} 
+.code-img{
+    margin: 5px 5px;
+    padding: 5px 5px;
+    /* background-color: #f7f5ec; */
+}
+.code-img img{
+    display: block;
+}
+.icon-push{
+    cursor: pointer;
+    background-position: -149px -95px;
+}
+.code-btn{
+	position: relative;
+    height: 30px;
+    width: 530px;
+    text-align: center;
+    color: #999;
+    margin: auto;
+    box-sizing: border-box;
+    background-color: #f5f6f7;
+    border-radius: 15px;
+    border: 1px solid #e1e1e1;
+}
+.code-btn-m{
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f5f6f7;
+    border: 1px solid #e1e1e1;
+    z-index: 5;
+    top:-8px;
+    left: 10px;
+    box-shadow: 0 0 3px #ccc;
+    cursor: pointer;
+	background-position: 4px 15px;
+}
+.code-btn-img{
+    background-image:url(../images/LRarrow.png);
+    background-repeat: no-repeat;
+	background-size: 32px 10px;
+} 
+/* .code-btn-img.active{
+    background-position: -134px 10px;
+}
+.code-btn-img.error{
+    background-position: 8px 10px;
+} */
+.code-img-con{
+    position: relative;
+}
+.code-mask{
+    position: absolute;
+    /* top: 124px; */
+  		/* left: 3px; */
+    z-index: 10;
+    width:100px;
+    height:43px;
+}
+.code-mask img{
+	width:100px;
+    height:43px;
+    /* border:1px solid #fb9d48; */
+}

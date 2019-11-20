@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.wssmb.mapper.MbAmmeterMapper">
+	<resultMap id="BaseResultMap"
+		type="com.ssm.wssmb.model.MbAmmeter">
+		<id column="id" property="id" jdbcType="DECIMAL" />
+		<result column="ammeterName" property="ammeterName"
+			jdbcType="VARCHAR" />
+		<result column="ammeterCode" property="ammeterCode"
+			jdbcType="VARCHAR" />
+		<result column="installAddress" property="installAddress"
+			jdbcType="INTEGER" />
+		<result column="concentratorCode" property="concentratorCode"
+			jdbcType="VARCHAR" />
+		<result column="organizationCode" property="organizationCode"
+			jdbcType="VARCHAR" />
+		<result column="produce" property="produce" jdbcType="VARCHAR" />
+		<result column="produceTime" property="produceTime"
+			jdbcType="VARCHAR" />
+		<result column="createPerson" property="createPerson"
+			jdbcType="VARCHAR" />
+		<result column="createTime" property="createTime"
+			jdbcType="VARCHAR" />
+		<result column="boxCode" property="boxCode" jdbcType="VARCHAR" />
+		<result column="ammeterType" property="ammeterType"
+			jdbcType="VARCHAR" />
+		<result column="softType" property="softType"
+			jdbcType="VARCHAR" />
+		<result column="hardType" property="hardType"
+			jdbcType="VARCHAR" />
+		<result column="COMMUNICATIONSTATUS"
+			property="COMMUNICATIONSTATUS" jdbcType="INTEGER" />
+		<result column="DOWNSTATUS" property="DOWNSTATUS"
+			jdbcType="INTEGER" />
+		<result column="switchStatus" property="switchStatus"
+			jdbcType="INTEGER" />
+			<result column="freezingtype" property="freezingtype"
+			jdbcType="INTEGER" />
+		<association property="earlyWarning"
+			javaType="com.ssm.wssmb.model.EarlyWarning">
+			<result property="id" column="earId" jdbcType="DECIMAL" />
+			<result property="occurtime" column="occurtime"
+				jdbcType="TIMESTAMP" />
+			<result property="processtime" column="processtime"
+				jdbcType="TIMESTAMP" />
+		</association>
+		<association property="concentrator"
+			javaType="com.ssm.wssmb.model.MbConcentrator">
+			<result property="address" column="address" jdbcType="VARCHAR" />
+		</association>
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, ammeterName, ammeterCode, installAddress,
+		concentratorCode,
+		organizationCode, produce,
+		produceTime,createPerson,createTime,boxCode,ammeterType,softType,hardType,switchStatus
+	</sql>
+	<select id="selectAll"
+		resultType="com.ssm.wssmb.model.MbAmmeter">
+		select * from mb_ammeter where 1=1
+		<if test="organizationId != 0">
+			and
+			IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		</if>
+		limit #{startin,jdbcType=DECIMAL},#{endindex,jdbcType=DECIMAL}
+	</select>
+	<select id="selectAll2"
+		resultType="com.ssm.wssmb.model.MbAmmeter">
+		select * from mb_ammeter limit
+		#{startin,jdbcType=DECIMAL},#{endindex,jdbcType=DECIMAL}
+	</select>
+	<insert id="addAmmeter"
+		parameterType="com.ssm.wssmb.model.MbAmmeter">
+		insert into mb_ammeter (ammeterName, ammeterCode,
+		installAddress,concentratorCode,organizationCode,produce,
+		produceTime,createPerson,createTime,boxCode,ammeterType,softType,hardType)
+		values (
+		#{ammeterName,jdbcType=VARCHAR},
+		#{ammeterCode,jdbcType=VARCHAR},
+		#{installAddress,jdbcType=INTEGER},
+		#{concentratorCode,jdbcType=VARCHAR},
+		#{organizationCode,jdbcType=VARCHAR},
+		#{produce,jdbcType=VARCHAR},
+		#{produceTime,jdbcType=VARCHAR},
+		#{createPerson,jdbcType=VARCHAR},
+		#{createTime,jdbcType=VARCHAR},
+		#{boxCode,jdbcType=VARCHAR},
+		#{ammeterType,jdbcType=VARCHAR},
+		#{softType,jdbcType=VARCHAR},
+		#{hardType,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<insert id="addOneAmmeter"
+		parameterType="com.ssm.wssmb.model.MbAmmeter">
+		insert into mb_ammeter (ammeterName, ammeterCode,
+		installAddress,concentratorCode,organizationCode,produce,
+		produceTime,createPerson,createTime,boxCode,ammeterType,softType,hardType)
+		values (
+		#{ammeterName,jdbcType=VARCHAR},
+		#{ammeterCode,jdbcType=VARCHAR},
+		#{installAddress,jdbcType=INTEGER},
+		#{concentratorCode,jdbcType=VARCHAR},
+		#{organizationCode,jdbcType=VARCHAR},
+		#{produce,jdbcType=VARCHAR},
+		#{produceTime,jdbcType=VARCHAR},
+		#{createPerson,jdbcType=VARCHAR},
+		#{createTime,jdbcType=VARCHAR},
+		#{boxCode,jdbcType=VARCHAR},
+		#{ammeterType,jdbcType=VARCHAR},
+		#{softType,jdbcType=VARCHAR},
+		#{hardType,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<update id="editAmmeter"
+		parameterType="com.ssm.wssmb.model.MbAmmeter">
+		update mb_ammeter
+		set ammeterName=
+		#{ammeterName,jdbcType=VARCHAR},
+		ammeterCode=#{ammeterCode,jdbcType=VARCHAR},
+		installAddress=#{installAddress,jdbcType=INTEGER},
+		concentratorCode=#{concentratorCode,jdbcType=VARCHAR},
+		organizationCode=#{organizationCode,jdbcType=VARCHAR},
+		produce=#{produce,jdbcType=VARCHAR},
+		produceTime=#{produceTime,jdbcType=VARCHAR},
+		boxCode=#{boxCode,jdbcType=VARCHAR},
+		ammeterType= #{ammeterType,jdbcType=VARCHAR},
+		softType=#{softType,jdbcType=VARCHAR},
+		hardType=#{hardType,jdbcType=VARCHAR}
+		where id=#{id,jdbcType=DECIMAL}
+	</update>
+
+	<delete id="deleteAmmeter" parameterType="java.lang.Integer">
+		delete from mb_ammeter
+		where id = #{id,jdbcType=DECIMAL}
+	</delete>
+
+	<select id="queryAmmeterByName"
+		resultType="com.ssm.wssmb.model.MbAmmeter">
+		select * from mb_ammeter where 1=1
+		<if test="inputValue != null and inputValue != ''">
+			and ammeterName like #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and
+			IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		</if>
+		limit #{startin,jdbcType=DECIMAL},#{endindex,jdbcType=DECIMAL}
+	</select>
+
+	<select id="queryAmmeterByCode"
+		resultType="com.ssm.wssmb.model.MbAmmeter">
+		select * from mb_ammeter where 1=1
+		<if test="inputValue != null and inputValue != ''">
+			and ammeterCode like #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and
+			IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		</if>
+		limit #{startin,jdbcType=DECIMAL},#{endindex,jdbcType=DECIMAL}
+	</select>
+
+	<select id="queryTotal" resultType="java.lang.Integer">
+		select id from mb_ammeter where 1=1
+		<if test="organizationId != 0">
+			and
+			IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		</if>
+	</select>
+
+	<select id="queryTotalByName" parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		select id from mb_ammeter where 1=1
+		<if test="inputValue != null and inputValue != ''">
+			and ammeterName like #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and
+			IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		</if>
+	</select>
+
+	<select id="queryTotalByCode" parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		select id from mb_ammeter where 1=1
+		<if test="inputValue != null and inputValue != '' ">
+			and ammeterCode like #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and
+			IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		</if>
+	</select>
+
+	<select id="getAmmeterByMeasurefile"
+		resultType="com.ssm.wssmb.model.MbAmmeter">
+		select * from mb_ammeter where 1=1 and
+		boxCode=#{measureId,jdbcType=VARCHAR}
+	</select>
+
+	<select id="getOneAmmeterByCode"
+		resultType="com.ssm.wssmb.model.MbAmmeter">
+		select * from mb_ammeter where id =
+		#{ammeterCode,jdbcType=DECIMAL}
+	</select>
+
+
+	<select id="getCodeByName" resultType="java.lang.Integer">
+		select id from mb_ammeter
+		where
+		ammeterName=#{ammeterName,jdbcType=VARCHAR}
+	</select>
+
+	<select id="nameExisted"
+		resultType="com.ssm.wssmb.model.MbAmmeter">
+		select * from mb_ammeter where
+		ammeterName=#{ammeterName,jdbcType=VARCHAR}
+	</select>
+
+	<select id="nameExistedAndId"
+		resultType="com.ssm.wssmb.model.MbAmmeter">
+		select * from mb_ammeter where
+		ammeterName=#{ammeterName,jdbcType=VARCHAR}
+		and
+		id!=#{id,jdbcType=DECIMAL}
+	</select>
+
+	<select id="getAmmeterByConcentratorId"
+		resultType="com.ssm.wssmb.model.MbAmmeter">
+		select * from mb_ammeter where
+		concentratorCode=#{concentratorId,jdbcType=DECIMAL}
+	</select>
+
+	<select id="getAmmeterByMeasureId"
+		resultType="com.ssm.wssmb.model.MbAmmeter">
+		SELECT
+		*
+		FROM
+		mb_ammeter
+		WHERE
+		id IN (
+		SELECT DISTINCT
+		id
+		FROM
+		mb_ammeter AS ma
+		INNER JOIN mb_concentrator AS mc,
+		mb_measurefile AS mm
+		WHERE
+		ma.concentratorCode = mc.concentratorId
+		AND mc.measureId =
+		#{measureId,jdbcType=DECIMAL}
+		)
+	</select>
+
+	<select id="getAmmeterWarnByMeasureId" resultMap="BaseResultMap">
+		SELECT
+		ma.*,be.id earId, be.processTime, be.occurTime
+		FROM
+		mb_ammeter ma,
+		bus_earlywarning be
+		WHERE
+		ma.ammeterCode = (
+		SELECT
+		equipmentAddress
+		FROM
+		bus_earlywarning
+		WHERE
+		measureAddress IN (
+		SELECT
+		MeasureNumber
+		FROM
+		mb_measurefile
+		WHERE
+		MeasureId = #{measureId,jdbcType=DECIMAL}
+		)
+		AND
+		ISNULL(endTime)
+		)
+		AND ISNULL(endTime)
+	</select>
+
+	<select id="getAmmeterFaultByMeasureId"
+		resultMap="BaseResultMap">
+		SELECT
+		ma.*,be.id earId, be.processTime, be.occurTime
+		FROM
+		mb_ammeter ma,
+		bus_fault be
+		WHERE
+		ma.ammeterCode IN (
+		SELECT
+		equipmentAddress
+		FROM
+		bus_fault
+		WHERE
+		measureAddress IN (
+		SELECT
+		MeasureNumber
+		FROM
+		mb_measurefile
+		WHERE
+		MeasureId
+		=#{measureId,jdbcType=DECIMAL}
+		)AND ISNULL(endTime)
+		)
+		AND ISNULL(endTime)
+	</select>
+
+	<select id="getAmmeterMessageByMeasureId"
+		resultMap="BaseResultMap">
+		SELECT
+		ma.*,be.id earId, be.occurTime
+		FROM
+		mb_ammeter ma,
+		bus_messagepushrecord be
+		WHERE
+		ma.ammeterCode IN (
+		SELECT
+		equipmentAddress
+		FROM
+		bus_messagepushrecord
+		WHERE
+		measureAddress IN (
+		SELECT
+		MeasureNumber
+		FROM
+		mb_measurefile
+		WHERE
+		MeasureId
+		=#{measureId,jdbcType=DECIMAL}
+		)
+		)
+	</select>
+	
+	 <select id="getTerminalListByIDs" resultMap="BaseResultMap">
+    select e.*
+    from mb_terminal e 
+    where e.terminalId in
+	  <foreach collection="ids" item="item" index="index" open="(" close=")" separator=",">
+  		#{item,jdbcType=INTEGER}
+ 	  </foreach> 
+    order by e.terminalId
+  </select>
+  
+  <select id="selectByAddress" resultMap="BaseResultMap">
+  select * from mb_ammeter
+  where ammeterCode=#{ammeterCode,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="getAmmeterListByIDs" resultMap="BaseResultMap">
+    select e.*
+    from mb_ammeter e 
+    where e.id in
+	  <foreach collection="ids" item="item" index="index" open="(" close=")" separator=",">
+  		#{item,jdbcType=INTEGER}
+ 	  </foreach> 
+    order by e.id
+  </select>
+  
+  <select id="selectByIdAndType" resultMap="BaseResultMap">
+  select t.* from mb_ammeter t
+  where t.id=#{equipmentid,jdbcType=INTEGER} 
+  </select>
+  
+    <select id="getAmmeterByAmmeterCode" resultMap="BaseResultMap">
+  select * from mb_ammeter where ammeterCode=#{ammeterCode,jdbcType=VARCHAR}
+  </select>
+  
+      <select id="getAmmeterCodeByid" resultMap="BaseResultMap">
+  select ma.ammeterCode,mc.address
+FROM
+	mb_ammeter AS ma
+INNER JOIN mb_concentrator AS mc ON ma.concentratorCode = mc.concentratorid AND ma.id=#{id,jdbcType=DECIMAL}
+  </select>
+</mapper>

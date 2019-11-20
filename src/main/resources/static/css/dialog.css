@@ -1,0 +1,44 @@
+/* µ¯³ö¿òÑùÊ½ */
+.window {
+	padding: 0;
+	border-width: 3px 1px 1px 1px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	box-shadow: 1px 1px 50px rgba(0, 0, 0, .3);
+	border-top-color: #2c3b41;
+}
+
+.window .window-body {
+	border-width: 0px;
+}
+
+.window .window-header .panel-tool {
+	right: 12px;
+}
+
+.window .window-header {
+	border-color: #e7eaec;
+	background: #f9f9f9;
+}
+
+.window .window-header .panel-icon {
+	left: 12px;
+	color: #444;
+	font-weight: normal;
+	font-size: 14px;
+}
+
+.window .window-header .panel-with-icon {
+	padding-left: 30px;
+	font-weight: normal;
+	font-size: 13px;
+}
+
+.window .window-header .panel-icon, .window .window-header .panel-tool {
+	/* margin-top: 0px; */
+}
+
+.window-proxy-mask, .window-mask {
+	background: #A7A39C;
+}
+

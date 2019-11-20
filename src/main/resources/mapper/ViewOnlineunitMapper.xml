@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.ViewOnlineunitMapper">
+	<resultMap id="BaseResultMap"
+		type="com.ssm.wssmb.model.ViewOnlineunit">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="clientLinke" property="clientLinke"
+			jdbcType="VARCHAR" />
+		<result column="onlineTime" property="onlinetime"
+			jdbcType="TIMESTAMP" />
+		<result column="droppedTime" property="droppedtime"
+			jdbcType="TIMESTAMP" />
+		<result column="UNITNAME" property="unitname"
+			jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="fepNum" property="fepNum" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="typename" property="typename"
+			jdbcType="VARCHAR" />
+		<result column="equipname" property="equipname"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectList" resultMap="BaseResultMap">
+		SELECT * FROM (SELECT
+		t.terminalName,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器' WHEN uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM bus_unitonline
+		uo,mb_terminal t
+		WHERE uo.address=t.address
+		AND uo.equipId=t.terminalId
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT c.concentratorName,uo.*,
+		CASE WHEN uo.type=1 THEN '集中器'
+		WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END typename
+		FROM bus_unitonline uo,mb_concentrator c
+		WHERE uo.address=c.address
+		AND
+		uo.equipId=c.concentratorId
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT a.ammeterName,uo.*,
+		CASE WHEN uo.type=1 THEN '集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END typename
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		)g
+	</select>
+
+	<select id="selectTerminalList" resultMap="BaseResultMap">
+		SELECT
+		t.terminalName,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器' WHEN uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM bus_unitonline
+		uo,mb_terminal t
+		WHERE uo.address=t.address
+		AND uo.equipId=t.terminalId
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.terminalId=#{id,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectListEquipmentList" resultMap="BaseResultMap">
+		SELECT * FROM
+		(SELECT
+		t.terminalName,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器' WHEN
+		uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM
+		bus_unitonline
+		uo,mb_terminal t
+		WHERE uo.address=t.address
+		AND
+		uo.equipId=t.terminalId
+		and ${terdition}
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT c.concentratorName,uo.*,
+		CASE WHEN uo.type=1 THEN '集中器'
+		WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END typename
+		FROM bus_unitonline uo,mb_concentrator c
+		WHERE uo.address=c.address
+		AND
+		uo.equipId=c.concentratorId
+		and ${condition}
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT a.ammeterName,uo.*,
+		CASE WHEN uo.type=1 THEN '集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END typename
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND ${amdition}
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		)g
+	</select>
+
+	<select id="selectRegionList" resultMap="BaseResultMap">
+		SELECT * FROM (SELECT
+		t.terminalName,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器' WHEN
+		uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM
+		bus_unitonline
+		uo,mb_terminal t,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE uo.address=t.address
+		AND
+		uo.equipId=t.terminalId
+		AND t.region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT c.concentratorName,uo.*,
+		CASE WHEN uo.type=1
+		THEN '集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE ''
+		END typename
+		FROM
+		bus_unitonline uo,mb_concentrator c,(SELECT id FROM
+		view_regiontree
+		WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		uo.address=c.address
+		AND
+		uo.equipId=c.concentratorId
+		AND c.region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		UNION
+		SELECT a.ammeterName,uo.*,
+		CASE WHEN uo.type=1 THEN '集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END typename
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and a.concentratorCode in(SELECT c.concentratorId FROM mb_concentrator
+		c,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		c.region=gg.id)
+		)g
+	</select>
+	
+	<select id="selectOrganizationList" resultMap="BaseResultMap">
+		SELECT * FROM (SELECT
+		t.terminalName,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器' WHEN
+		uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM
+		bus_unitonline
+		uo,mb_terminal t
+		WHERE uo.address=t.address
+		AND
+		uo.equipId=t.terminalId
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{id,jdbcType=INTEGER})=1
+		UNION
+		SELECT c.concentratorName,uo.*,
+		CASE WHEN uo.type=1
+		THEN '集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE ''
+		END typename
+		FROM
+		bus_unitonline uo,mb_concentrator c
+		WHERE
+		uo.address=c.address
+		AND
+		uo.equipId=c.concentratorId
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{id,jdbcType=INTEGER})=1
+		UNION
+		SELECT a.ammeterName,uo.*,
+		CASE WHEN uo.type=1 THEN '集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END typename
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{id,jdbcType=INTEGER})=1
+		)g
+	</select>
+
+	<select id="getConcentratorList" resultMap="BaseResultMap">
+		SELECT c.concentratorName as equipname,uo.*,
+		CASE WHEN uo.type=1
+		THEN
+		'集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE ''
+		END
+		typename
+		FROM bus_unitonline uo,mb_concentrator c,(SELECT id FROM
+		view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		uo.address=c.address
+		AND
+		uo.equipId=c.concentratorId
+		AND c.region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+		limit #{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getConcentratorCount" resultType="java.lang.Integer">
+		SELECT count(0)
+		FROM bus_unitonline uo,mb_concentrator c,(SELECT id
+		FROM
+		view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		uo.address=c.address
+		AND
+		uo.equipId=c.concentratorId
+		AND c.region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="getConcentratorListById" resultMap="BaseResultMap">
+		SELECT c.concentratorName as equipname,uo.*,
+		CASE WHEN uo.type=1
+		THEN
+		'集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE ''
+		END
+		typename
+		FROM bus_unitonline uo,mb_concentrator c
+		WHERE
+		uo.address=c.address
+		AND
+		uo.equipId=c.concentratorId
+		AND ${tdition}
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+		limit #{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getConcentratorCountById"
+		resultType="java.lang.Integer">
+		SELECT count(0)
+		FROM bus_unitonline uo,mb_concentrator c
+		WHERE
+		uo.address=c.address
+		AND
+		uo.equipId=c.concentratorId
+		AND ${tdition}
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="getTerminalList" resultMap="BaseResultMap">
+		SELECT
+		t.terminalName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器'
+		WHEN
+		uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM
+		bus_unitonline
+		uo,mb_terminal t,(SELECT id FROM view_regiontree
+		WHERE
+		id=#{id,jdbcType=INTEGER} OR pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE uo.address=t.address
+		AND
+		uo.equipId=t.terminalId
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.region=gg.id
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+		limit #{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getTerminalCount" resultType="java.lang.Integer">
+		SELECT
+		count(0)
+		FROM
+		bus_unitonline
+		uo,mb_terminal t,(SELECT id FROM
+		view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		uo.address=t.address
+		AND
+		uo.equipId=t.terminalId
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		AND t.region=gg.id
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="getTerminalListById" resultMap="BaseResultMap">
+		SELECT
+		t.terminalName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器'
+		WHEN
+		uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM
+		bus_unitonline
+		uo,mb_terminal t
+		WHERE uo.address=t.address
+		and
+		${tdition}
+		AND
+		uo.equipId=t.terminalId
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+		limit #{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getTerminalCountById" resultType="java.lang.Integer">
+		SELECT
+		count(0)
+		FROM
+		bus_unitonline
+		uo,mb_terminal t
+		WHERE
+		uo.address=t.address
+		and ${tdition}
+		AND
+		uo.equipId=t.terminalId
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="getAmmeterList" resultMap="BaseResultMap">
+		SELECT a.ammeterName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN '集中器'
+		WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END typename
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and a.concentratorCode in(SELECT c.concentratorId FROM mb_concentrator
+		c,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		c.region=gg.id)
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+		limit #{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getAmmeterCount" resultType="java.lang.Integer">
+		SELECT count(0)
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE
+		uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and a.concentratorCode in(SELECT c.concentratorId FROM mb_concentrator
+		c,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		c.region=gg.id)
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="getAmmeterListById" resultMap="BaseResultMap">
+		SELECT a.ammeterName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN '集中器'
+		WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END typename
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and ${tdition}
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+		limit #{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getAmmeterCountById" resultType="java.lang.Integer">
+		SELECT count(0)
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE
+		uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and ${tdition}
+		<if test="status !=null and status !=''">
+			and uo.status=#{status,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="getAllList" resultMap="BaseResultMap">
+		select * from (SELECT c.concentratorName as equipname,uo.*,
+		CASE WHEN
+		uo.type=1
+		THEN
+		'集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表'
+		ELSE ''
+		END
+		typename
+		FROM bus_unitonline uo,mb_concentrator c,(SELECT id
+		FROM
+		view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		uo.address=c.address
+		AND
+		uo.equipId=c.concentratorId
+		AND c.region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		union
+		SELECT
+		t.terminalName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器'
+		WHEN
+		uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM
+		bus_unitonline
+		uo,mb_terminal t,(SELECT id FROM
+		view_regiontree
+		WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		uo.address=t.address
+		AND
+		uo.equipId=t.terminalId
+		AND t.region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		union
+		SELECT a.ammeterName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器'
+		WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE
+		uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and a.concentratorCode in(SELECT c.concentratorId FROM mb_concentrator
+		c,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		c.region=gg.id))eq
+		where 1=1
+		<if test="status !=null and status !=''">
+			and eq.status=#{status,jdbcType=VARCHAR}
+		</if>
+		limit #{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getAllCount" resultType="java.lang.Integer">
+		select count(0) from (SELECT c.concentratorName as equipname,uo.*,
+		CASE WHEN uo.type=1
+		THEN
+		'集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE ''
+		END
+		typename
+		FROM bus_unitonline uo,mb_concentrator
+		c,(SELECT id FROM
+		view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		uo.address=c.address
+		AND
+		uo.equipId=c.concentratorId
+		AND c.region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		union
+		SELECT
+		t.terminalName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器'
+		WHEN
+		uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM
+		bus_unitonline
+		uo,mb_terminal t,(SELECT id FROM
+		view_regiontree
+		WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		uo.address=t.address
+		AND
+		uo.equipId=t.terminalId
+		AND t.region=gg.id
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		union
+		SELECT a.ammeterName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器'
+		WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE
+		uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and a.concentratorCode in(SELECT c.concentratorId FROM mb_concentrator
+		c,(SELECT id FROM view_regiontree WHERE
+		id=#{id,jdbcType=INTEGER} OR
+		pid=#{id,jdbcType=INTEGER} OR
+		p2id=#{id,jdbcType=INTEGER} OR
+		p3id=#{id,jdbcType=INTEGER} OR
+		p4id=#{id,jdbcType=INTEGER}) gg
+		WHERE
+		c.region=gg.id))eq
+		where 1=1
+		<if test="status !=null and status !=''">
+			and eq.status=#{status,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="getAllListById" resultMap="BaseResultMap">
+		select * from (SELECT c.concentratorName as equipname,uo.*,
+		CASE WHEN
+		uo.type=1
+		THEN
+		'集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表'
+		ELSE ''
+		END
+		typename
+		FROM bus_unitonline uo,mb_concentrator c
+		WHERE
+		uo.address=c.address
+		and ${cdition}
+		AND
+		uo.equipId=c.concentratorId
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		union
+		SELECT
+		t.terminalName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器'
+		WHEN
+		uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM
+		bus_unitonline
+		uo,mb_terminal t
+		WHERE uo.address=t.address
+		and ${tdition}
+		AND
+		uo.equipId=t.terminalId
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		union
+		SELECT a.ammeterName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器'
+		WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE
+		uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and ${adition})eq
+		where 1=1
+		<if test="status !=null and status !=''">
+			and eq.status=#{status,jdbcType=VARCHAR}
+		</if>
+		limit #{startindex,jdbcType=INTEGER},#{endindex,jdbcType=INTEGER}
+	</select>
+
+	<select id="getAllCountById" resultType="java.lang.Integer">
+		select count(0) from (SELECT c.concentratorName as equipname,uo.*,
+		CASE WHEN uo.type=1
+		THEN
+		'集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE ''
+		END
+		typename
+		FROM bus_unitonline uo,mb_concentrator c
+		WHERE
+		uo.address=c.address
+		and ${cdition}
+		AND
+		uo.equipId=c.concentratorId
+		AND
+		IS_PARENT_ORGANIZATION(c.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		union
+		SELECT
+		t.terminalName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器'
+		WHEN
+		uo.type=2 THEN
+		'监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM
+		bus_unitonline
+		uo,mb_terminal t
+		WHERE uo.address=t.address
+		and ${tdition}
+		AND
+		uo.equipId=t.terminalId
+		AND
+		IS_PARENT_ORGANIZATION(t.organizationId,#{organizationId,jdbcType=INTEGER})=1
+		union
+		SELECT a.ammeterName as equipname,uo.*,
+		CASE WHEN uo.type=1 THEN
+		'集中器'
+		WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE '' END
+		typename
+		FROM bus_unitonline uo,mb_ammeter a
+		WHERE
+		uo.address=a.ammeterCode
+		AND
+		uo.equipId=a.id
+		AND
+		IS_PARENT_ORGANIZATION(a.organizationCode,#{organizationId,jdbcType=INTEGER})=1
+		and ${adition})eq
+		where 1=1
+		<if test="status !=null and status !=''">
+			and eq.status=#{status,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="getUnitRowByID" resultMap="BaseResultMap">
+		select uo.*,
+		case when uo.type=1
+		THEN
+		'集中器' WHEN
+		uo.type=2 THEN '监控终端' WHEN uo.type=3
+		THEN '电表' ELSE ''
+		END
+		typename
+		from
+		bus_unitonline uo
+		where  uo.equipId =
+		#{unitid,jdbcType=DECIMAL}
+	<choose>
+	<when test="type==4">
+	and uo.type=1
+	</when>
+	<when test="type==5">
+	and uo.type=2
+	</when>
+	<when test="type==6">
+	and uo.type=3
+	</when>
+	</choose>
+	</select>
+	
+</mapper>

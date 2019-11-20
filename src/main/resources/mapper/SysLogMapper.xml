@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.SysLogMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.SysLog" >
+    <id column="LOGID" property="logid" jdbcType="DECIMAL" />
+    <result column="USERID" property="userid" jdbcType="DECIMAL" />
+    <result column="IP" property="ip" jdbcType="VARCHAR" />
+    <result column="TITLE" property="title" jdbcType="VARCHAR" />
+    <result column="CONTENT" property="content" jdbcType="VARCHAR" />
+    <result column="OPERTYPE" property="opertype" jdbcType="DECIMAL" />
+    <result column="INTIME" property="intime" jdbcType="TIMESTAMP" />
+    
+    <result column="USERNAME" property="username" jdbcType="VARCHAR" /> 
+    <result column="OPERATENAME" property="operatename" jdbcType="VARCHAR" /> 
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    LOGID, USERID, IP, TITLE, CONTENT, OPERTYPE, INTIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  	select l.*,u.username,
+    case when l.opertype='0' then '添加'
+     when l.opertype='1' then '删除'
+       when l.opertype='2' then '编辑'
+         when l.opertype='3' then '启用'
+           when l.opertype='4' then '禁用'
+             when l.opertype='5' then '请求'
+               when l.opertype='6' then '响应' 
+               when l.opertype='7' then '设置' 
+               end as operatename
+    from sys_log l
+    left join Sys_User u on u.id = l.userid
+    where l.LOGID = #{logid,jdbcType=DECIMAL}
+  </select>
+  
+  <select id="selectLogs"  resultMap="BaseResultMap">
+     SELECT * FROM(select l.*,u.username,
+     case when l.opertype='0' then '添加'
+     when l.opertype='1' then '删除'
+       when l.opertype='2' then '编辑'
+         when l.opertype='3' then '启用'
+           when l.opertype='4' then '禁用'
+             when l.opertype='5' then '请求'
+               when l.opertype='6' then '响应'
+               when l.opertype='7' then '设置'  
+               end as operatename
+     from sys_log l
+     left join Sys_User u on u.id = l.userid
+     left join view_organization o on o.code = u.organizationcode
+     where 1=1
+      <if test="orglist !=null and orglist">
+     	 and o.code in
+		<foreach collection="orglist" index="index" item="item" open="(" close=")"
+			separator=",">
+			#{item.code,jdbcType=VARCHAR}
+		</foreach>
+	  </if>
+      <if test="user != null and user!='' ">
+       and u.username like CONCAT(CONCAT('%', #{user,jdbcType=VARCHAR}), '%')
+      </if> 
+      <if test="starttime != null and starttime!='' ">
+       <!-- and starttime = #{starttime,jdbcType=VARCHAR} -->
+       and l.INTIME &gt;= str_to_date(#{starttime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+      </if>
+       <if test="endtime != null and endtime!='' ">
+       and l.INTIME &lt;= str_to_date(#{endtime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+      </if> 
+      <if test="keyword != null and keyword!='' ">
+       and(
+	       l.title like CONCAT(CONCAT('%', #{keyword,jdbcType=VARCHAR}), '%')
+	       or l.content like CONCAT(CONCAT('%', #{keyword,jdbcType=VARCHAR}), '%')
+       )
+      </if>
+      <if test="operatetype != null and operatetype!='' ">
+       and l.opertype = #{operatetype,jdbcType=VARCHAR}
+      </if>
+      <if test="organizationcode != null" >
+        and u.ORGANIZATIONCODE in
+        (select code from view_organization 
+        Where FIND_IN_SET(code,getChildList(#{organizationcode,jdbcType=VARCHAR}))
+        )
+      </if>
+     order by l.intime DESC  ) t     
+       ORDER BY t.intime DESC  
+       limit #{startin,jdbcType=DECIMAL} , #{endindex,jdbcType=DECIMAL} 
+  </select>
+  
+  <select id="selectLogsCount" resultType="java.lang.Integer">
+     select count(0) from sys_log l
+     left join Sys_User u on u.id = l.userid
+     left join view_organization o on o.code = u.organizationcode
+     where 1=1
+      <if test="orglist !=null and orglist">
+     	 and o.code in
+		<foreach collection="orglist" index="index" item="item" open="(" close=")"
+			separator=",">
+			#{item.code,jdbcType=VARCHAR}
+		</foreach>
+	  </if>
+      <if test="user != null and user!='' ">
+       and u.username like CONCAT(CONCAT('%', #{user,jdbcType=VARCHAR}), '%')
+      </if> 
+      <if test="starttime != null and starttime!='' ">
+       <!-- and starttime = #{starttime,jdbcType=VARCHAR} -->
+       and l.INTIME &gt;= str_to_date(#{starttime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+      </if>
+       <if test="endtime != null and endtime!='' ">
+       and l.INTIME &lt;= str_to_date(#{endtime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+      </if> 
+      <if test="keyword != null and keyword!='' ">
+      and(
+	       l.title like CONCAT(CONCAT('%', #{keyword,jdbcType=VARCHAR}), '%')
+	       or l.content like CONCAT(CONCAT('%', #{keyword,jdbcType=VARCHAR}), '%')
+       )
+      </if>
+      <if test="operatetype != null and operatetype!='' ">
+       and l.opertype = #{operatetype,jdbcType=VARCHAR}
+      </if>
+      <if test="organizationcode != null" >
+        and u.ORGANIZATIONCODE in
+        (select code from view_organization 
+        Where FIND_IN_SET(code,getChildList(#{organizationcode,jdbcType=VARCHAR}))
+        )
+      </if>
+  </select>
+  
+  <select id="selectExportLogs"  resultMap="BaseResultMap">
+     select l.*,u.username,
+     case when l.opertype='0' then '添加'
+     when l.opertype='1' then '删除'
+       when l.opertype='2' then '编辑'
+         when l.opertype='3' then '启用'
+           when l.opertype='4' then '禁用'
+             when l.opertype='5' then '请求'
+               when l.opertype='6' then '响应'
+               when l.opertype='7' then '设置' 
+                end as operatename
+     from sys_log l
+     left join Sys_User u on u.id = l.userid
+     left join view_organization o on o.code = u.organizationcode
+     where 1=1
+      <if test="orglist !=null and orglist">
+     	 and o.code in
+		<foreach collection="orglist" index="index" item="item" open="(" close=")"
+			separator=",">
+			#{item.code,jdbcType=VARCHAR}
+		</foreach>
+	  </if>
+      <if test="user != null and user!='' ">
+       and u.username like CONCAT(CONCAT('%', #{user,jdbcType=VARCHAR}), '%')
+      </if> 
+      <if test="starttime != null and starttime!='' ">
+       <!-- and starttime = #{starttime,jdbcType=VARCHAR} -->
+       and l.INTIME &gt;= str_to_date(#{starttime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+      </if>
+       <if test="endtime != null and endtime!='' ">
+       and l.INTIME &lt;= str_to_date(#{endtime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+      </if> 
+      <if test="keyword != null and keyword!='' ">
+       and(
+	       l.title like CONCAT(CONCAT('%', #{keyword,jdbcType=VARCHAR}), '%')
+	       or l.content like CONCAT(CONCAT('%', #{keyword,jdbcType=VARCHAR}), '%')
+       )
+      </if>
+      <if test="operatetype != null and operatetype!='' ">
+       and l.opertype = #{operatetype,jdbcType=VARCHAR}
+      </if>
+      <if test="organizationcode != null" >
+        and u.ORGANIZATIONCODE in
+        (select code from view_organization 
+        Where FIND_IN_SET(code,getChildList(#{organizationcode,jdbcType=VARCHAR}))
+        )
+      </if>
+       ORDER BY l.intime DESC
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from SYS_LOG
+    where LOGID = #{logid,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.SysLog" >
+    insert into SYS_LOG (USERID, IP, 
+      TITLE, CONTENT, OPERTYPE, 
+      INTIME)
+    values (#{userid,jdbcType=DECIMAL}, #{ip,jdbcType=VARCHAR}, 
+      #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{opertype,jdbcType=DECIMAL}, 
+      #{intime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.SysLog" >
+    insert into SYS_LOG
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userid != null" >
+        USERID,
+      </if>
+      <if test="ip != null" >
+        IP,
+      </if>
+      <if test="title != null" >
+        TITLE,
+      </if>
+      <if test="content != null" >
+        CONTENT,
+      </if>
+      <if test="opertype != null" >
+        OPERTYPE,
+      </if>
+      <if test="intime != null" >
+        INTIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userid != null" >
+        #{userid,jdbcType=DECIMAL},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="opertype != null" >
+        #{opertype,jdbcType=DECIMAL},
+      </if>
+      <if test="intime != null" >
+        #{intime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.SysLog" >
+    update SYS_LOG
+    <set >
+      <if test="userid != null" >
+        USERID = #{userid,jdbcType=DECIMAL},
+      </if>
+      <if test="ip != null" >
+        IP = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        TITLE = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        CONTENT = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="opertype != null" >
+        OPERTYPE = #{opertype,jdbcType=DECIMAL},
+      </if>
+      <if test="intime != null" >
+        INTIME = #{intime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where LOGID = #{logid,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.SysLog" >
+    update SYS_LOG
+    set USERID = #{userid,jdbcType=DECIMAL},
+      IP = #{ip,jdbcType=VARCHAR},
+      TITLE = #{title,jdbcType=VARCHAR},
+      CONTENT = #{content,jdbcType=VARCHAR},
+      OPERTYPE = #{opertype,jdbcType=DECIMAL},
+      INTIME = #{intime,jdbcType=TIMESTAMP}
+    where LOGID = #{logid,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="getLogListByIdAndType"  resultMap="BaseResultMap">
+     SELECT * FROM(select l.*,u.username,
+     case when l.opertype='0' then '添加'
+     when l.opertype='1' then '删除'
+       when l.opertype='2' then '编辑'
+         when l.opertype='3' then '启用'
+           when l.opertype='4' then '禁用'
+             when l.opertype='5' then '请求'
+               when l.opertype='6' then '响应'
+               when l.opertype='7' then '设置'  
+               end as operatename
+     from sys_log l
+     left join Sys_User u on u.id = l.userid   
+     where   1=1 
+     <if test="userlist !=null ">
+     	 and u.id in
+		<foreach collection="userlist" index="index" item="item" open="(" close=")"
+			separator=",">
+			#{item.id,jdbcType=INTEGER}
+		</foreach>
+	  </if>   
+      <if test="starttime != null and starttime!='' ">
+       and l.INTIME &gt;= str_to_date(#{starttime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+      </if>
+       <if test="endtime != null and endtime!='' ">
+       and l.INTIME &lt;= str_to_date(#{endtime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+      </if> 
+      <if test="keyword != null and keyword!='' ">
+       and(
+	       l.title like CONCAT(CONCAT('%', #{keyword,jdbcType=VARCHAR}), '%')
+	       or l.content like CONCAT(CONCAT('%', #{keyword,jdbcType=VARCHAR}), '%')
+       )
+      </if>
+      <if test="operatetype != null and operatetype!='' ">
+       and l.opertype = #{operatetype,jdbcType=VARCHAR}
+      </if>     
+     order by l.intime DESC  ) t     
+       ORDER BY t.intime DESC  
+       limit #{startindex,jdbcType=INTEGER} , #{endindex,jdbcType=INTEGER} 
+  </select>
+  
+  <select id="getLogCountByIdAndType"  resultType="Integer">
+     SELECT count(0) FROM(select l.*,u.username,
+     case when l.opertype='0' then '添加'
+     when l.opertype='1' then '删除'
+       when l.opertype='2' then '编辑'
+         when l.opertype='3' then '启用'
+           when l.opertype='4' then '禁用'
+             when l.opertype='5' then '请求'
+               when l.opertype='6' then '响应'
+               when l.opertype='7' then '设置'  
+               end as operatename
+     from sys_log l
+     left join Sys_User u on u.id = l.userid   
+     where   1=1 
+     <if test="userlist !=null ">
+     	 and u.id in
+		<foreach collection="userlist" index="index" item="item" open="(" close=")"
+			separator=",">
+			#{item.id,jdbcType=INTEGER}
+		</foreach>
+	  </if>   
+      <if test="starttime != null and starttime!='' ">
+       and l.INTIME &gt;= str_to_date(#{starttime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+      </if>
+       <if test="endtime != null and endtime!='' ">
+       and l.INTIME &lt;= str_to_date(#{endtime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+      </if> 
+      <if test="keyword != null and keyword!='' ">
+       and(
+	       l.title like CONCAT(CONCAT('%', #{keyword,jdbcType=VARCHAR}), '%')
+	       or l.content like CONCAT(CONCAT('%', #{keyword,jdbcType=VARCHAR}), '%')
+       )
+      </if>
+      <if test="operatetype != null and operatetype!='' ">
+       and l.opertype = #{operatetype,jdbcType=VARCHAR}
+      </if>    
+     order by l.intime DESC  ) t         
+  </select>
+</mapper>

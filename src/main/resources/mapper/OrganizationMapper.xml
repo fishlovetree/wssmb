@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.OrganizationMapper">
+	<resultMap id="BaseResultMap" type="com.ssm.wssmb.model.Organization">
+		<id column="ORGANIZATIONID" property="organizationid" jdbcType="DECIMAL" />
+		<result column="ORGANIZATIONCODE" property="organizationcode"
+			jdbcType="VARCHAR" />
+		<result column="ORGANIZATIONNAME" property="organizationname"
+			jdbcType="VARCHAR" />
+		<result column="PARENTID" property="parentid" jdbcType="DECIMAL" />
+		<result column="STATUS" property="status" jdbcType="DECIMAL" />
+		<result column="COMPACTOR" jdbcType="DECIMAL" property="compactor" />
+        <result column="COMPILATIONTIME" jdbcType="TIMESTAMP" property="compilationtime" />
+	</resultMap>
+	<resultMap id="OrganizationUserMap" type="com.ssm.wssmb.model.OrganizationUser" >
+	    <id column="ID" property="id" jdbcType="DECIMAL" />
+	    <result column="ORGANIZATIONID" property="organizationid" jdbcType="DECIMAL" />
+	    <result column="NAME" property="name" jdbcType="VARCHAR" />
+	    <result column="PHONE" property="phone" jdbcType="VARCHAR" />
+	    <result column="TYPE" property="type" jdbcType="DECIMAL" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ORGANIZATIONID, ORGANIZATIONCODE, ORGANIZATIONNAME,
+		PARENTID, STATUS, COMPACTOR, COMPILATIONTIME
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from SYS_ORGANIZATION
+		where ORGANIZATIONID =
+		#{organizationid,jdbcType=DECIMAL}
+	</select>
+	
+	<!--根据code获取组织机构 -->
+	<select id="selectBycode" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from SYS_ORGANIZATION
+		where ORGANIZATIONCODE =
+		#{organizationcode,jdbcType=VARCHAR}
+	</select>
+	
+	<!--获取组织机构集合 -->
+	<select id="selectList" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		n.ORGANIZATIONID, n.ORGANIZATIONCODE, n.ORGANIZATIONNAME,
+		n.PARENTID, n.STATUS
+		from SYS_ORGANIZATION n where n.ORGANIZATIONID !=
+		#{organizationid,jdbcType=DECIMAL} and n.STATUS = 1
+		<if test="parentid !=null and parentid!=0 ">
+		Where 	IS_PARENT_ORGANIZATION(n.ORGANIZATIONID,#{parentid,jdbcType=VARCHAR})=1   		 
+		</if>
+	</select>
+	<!-- 通过上级组织机构id查询子集组织机构集合 -->
+	<select id="selectListByParentId" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from SYS_ORGANIZATION
+		where PARENTID =
+		#{organizationid,jdbcType=DECIMAL} and STATUS = 1
+	</select>
+	<!-- 获取已存在组织机构代码数量 -->
+	<select id="selectCountByCode" resultType="java.lang.Integer">
+		select
+		count(ORGANIZATIONID)
+		from SYS_ORGANIZATION
+		where ORGANIZATIONCODE =
+		#{organizationcode,jdbcType=VARCHAR}
+		and ORGANIZATIONID !=
+		#{organizationid,jdbcType=DECIMAL}
+		and STATUS = 1
+	</select>
+	
+	<!-- 根据organizationid获取下级所有组织机构集合（by prior） -->
+	<select id="selectAllList" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select * from SYS_ORGANIZATION 
+		Where IS_PARENT_ORGANIZATION(ORGANIZATIONID,#{organizationid,jdbcType=VARCHAR})=1   
+		 and STATUS = 1
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		update
+		SYS_ORGANIZATION set STATUS = 0
+		where ORGANIZATIONID =
+		#{organizationid,jdbcType=DECIMAL}
+	</delete>
+	<delete id="deleteProxyAlarmPlan" parameterType="java.lang.Integer">
+		update
+		BUS_PROXYALARMPLAN set STATUS = 0
+		where PROXYID =
+		#{organizationid,jdbcType=DECIMAL}
+	</delete>
+	<insert id="insert" parameterType="com.ssm.wssmb.model.Organization">
+		insert into SYS_ORGANIZATION
+		(ORGANIZATIONCODE,
+		ORGANIZATIONNAME, PARENTID, STATUS, COMPACTOR
+		)
+		values (
+		#{organizationcode,jdbcType=VARCHAR},
+		#{organizationname,jdbcType=VARCHAR}, #{parentid,jdbcType=DECIMAL},
+		#{status,jdbcType=DECIMAL}, #{compactor,jdbcType=DECIMAL}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.ssm.wssmb.model.Organization">
+	    insert into SYS_ORGANIZATION
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="organizationcode != null">
+				ORGANIZATIONCODE,
+			</if>
+			<if test="organizationname != null">
+				ORGANIZATIONNAME,
+			</if>
+			<if test="parentid != null">
+				PARENTID,
+			</if>
+			STATUS,
+			<if test="compactor != null">
+				COMPACTOR,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="organizationcode != null">
+				#{organizationcode,jdbcType=VARCHAR},
+			</if>
+			<if test="organizationname != null">
+				#{organizationname,jdbcType=VARCHAR},
+			</if>
+			<if test="parentid != null">
+				#{parentid,jdbcType=DECIMAL},
+			</if>
+			1,
+			<if test="compactor != null">
+				#{compactor,jdbcType=DECIMAL},
+			</if>
+		</trim>
+		;
+		<!-- 自动生成告警方案 -->
+		insert into BUS_PROXYALARMPLAN(PROXYID, ALMENATHRESHOLD, MANDATARY,
+		FEPCONFIG, DIALERCONFIG, DIALERNUM, DIALERMODEL,
+		SOUNDCONTENT, SOUNDPLAYTIME, DIALMODE, SMSCONFIG, SMSNUM, SMSMODEL, SMSCONTENT,
+		SMSMODE,
+		STATUS, COMPILATIONTIME) select (SELECT max(organizationid) FROM SYS_ORGANIZATION), ALMENATHRESHOLD, MANDATARY,
+		FEPCONFIG, DIALERCONFIG, DIALERNUM, DIALERMODEL,
+		SOUNDCONTENT, SOUNDPLAYTIME, DIALMODE, SMSCONFIG, SMSNUM, SMSMODEL, SMSCONTENT,
+		SMSMODE, 1, sysdate()
+		from BUS_PROXYALARMPLAN where plantype = 0;
+		insert
+		into BUS_PROXYALARMPLANEVENT(PLANID, EVENTID) select (SELECT max(id) FROM BUS_PROXYALARMPLAN), eventid
+		from BUS_PROXYALARMPLANEVENT
+		where planid = (select id from
+		bus_proxyalarmplan where plantype = 0);
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.Organization">
+		update SYS_ORGANIZATION
+		<set>
+			<if test="organizationcode != null">
+				ORGANIZATIONCODE = #{organizationcode,jdbcType=VARCHAR},
+			</if>
+			<if test="organizationname != null">
+				ORGANIZATIONNAME = #{organizationname,jdbcType=VARCHAR},
+			</if>
+			<if test="parentid != null">
+				PARENTID = #{parentid,jdbcType=DECIMAL},
+			</if>
+			<if test="status != null">
+				STATUS = #{status,jdbcType=DECIMAL},
+			</if>
+			<if test="compactor != null">
+				COMPACTOR = #{compactor,jdbcType=DECIMAL},
+			</if>
+		</set>
+		where ORGANIZATIONID = #{organizationid,jdbcType=DECIMAL}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.Organization">
+		update
+		SYS_ORGANIZATION
+		set ORGANIZATIONCODE =
+		#{organizationcode,jdbcType=VARCHAR},
+		ORGANIZATIONNAME =
+		#{organizationname,jdbcType=VARCHAR},
+		PARENTID =
+		#{parentid,jdbcType=DECIMAL},
+		STATUS = #{status,jdbcType=DECIMAL},
+		COMPACTOR =
+		#{compactor,jdbcType=DECIMAL}
+		where
+		ORGANIZATIONID = #{organizationid,jdbcType=DECIMAL}
+	</update>
+	<select id="selectUserList" resultMap="OrganizationUserMap">
+	    select u.* from SYS_ORGANIZATIONUSER u
+	    where u.organizationid = #{organizationid,jdbcType=DECIMAL}
+	    order by u.id
+	</select>
+	<delete id="deleteAlarmUser" parameterType="java.lang.Integer">
+	    delete from SYS_ORGANIZATIONUSER
+	    where id = #{id,jdbcType=DECIMAL}
+	</delete>
+	<insert id="insertAlarmUser" parameterType="com.ssm.wssmb.model.OrganizationUser" >
+	    insert into SYS_ORGANIZATIONUSER (ORGANIZATIONID, NAME, PHONE, TYPE)
+	    values (#{organizationid,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+	       #{type,jdbcType=DECIMAL})
+	</insert>
+	<select id="selectUserCount" parameterType="com.ssm.wssmb.model.OrganizationUser" resultType="java.lang.Integer">
+	    select count(id) from SYS_ORGANIZATIONUSER
+	    where organizationid = #{organizationid,jdbcType=DECIMAL} and phone = #{phone,jdbcType=VARCHAR}
+	</select>
+	
+		<select id="getCodeByName" parameterType="java.lang.String" resultType="java.lang.Integer">
+	    select organizationid from SYS_ORGANIZATION
+	    where organizationname = #{organizationname,jdbcType=VARCHAR}
+	</select>
+</mapper>

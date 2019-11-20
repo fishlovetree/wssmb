@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.wssmb.mapper.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.wssmb.model.User" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="USERNAME" property="username" jdbcType="VARCHAR" />
+    <result column="PASSWORD" property="password" jdbcType="VARCHAR" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="THEME" property="theme" jdbcType="DECIMAL" />
+    <result column="USERTYPE" property="usertype" jdbcType="DECIMAL" />
+    <result column="ORGANIZATIONCODE" property="organizationcode" jdbcType="VARCHAR" /><!-- 父级code -->
+    <result column="USERLEVEL" property="userLevel" jdbcType="DECIMAL" />
+    <result column="ORGANIZATIONNAME" property="organizationname" jdbcType="VARCHAR" /><!-- 父级name -->
+    <result column="ROLENAME" property="rolename" jdbcType="VARCHAR" />
+    
+    <result column="ORGANIZATIONTYPE" property="organizationtype" jdbcType="DECIMAL" /><!-- 用户类型- 1：组织机构账户；2：用户账户 -->
+    <result column="ORGANIZATIONID" property="organizationid" jdbcType="DECIMAL" /><!-- 父级id -->
+    <result column="PERMISSIONS" property="permissions" jdbcType="VARCHAR" /><!-- 特殊权限 -->
+    
+    <result column="CREATOR" property="creator" jdbcType="DECIMAL" /><!-- 创建人ID -->
+    <result column="CREATORNAME" property="creatorname" jdbcType="VARCHAR" /><!-- 创建人姓名 -->
+    <result column="INTIME" property="intime" jdbcType="TIMESTAMP" /><!-- 创建日期 -->
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, USERNAME, PASSWORD, REMARK, STATUS, THEME, ORGANIZATIONCODE, USERLEVEL, USERTYPE, CREATOR, INTIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_USER
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  <select id="selectByUserName" resultMap="BaseResultMap">
+    select u.* , n.NAME as ORGANIZATIONNAME, n.type as organizationtype, n.id as organizationid,
+    (select group_concat(distinct rp.permission) from sys_rolepermission rp left join sys_role r on r.id = rp.roleid
+    left join sys_userrole ur on ur.roleid = r.id where ur.userid = u.ID and r.status=1) as permissions
+    from SYS_USER u
+    left join view_organization n on n.CODE = u.ORGANIZATIONCODE
+    where  USERNAME = #{username,jdbcType=VARCHAR}
+    and STATUS=1
+  </select>
+  <!--查询所有账号 -->
+  <select id="selectUserList" resultMap="BaseResultMap" >
+    select 
+    u.ID, u.USERNAME, u.PASSWORD, u.REMARK, u.STATUS, u.THEME, u.ORGANIZATIONCODE, u.USERLEVEL, n.NAME as ORGANIZATIONNAME, u.USERTYPE,
+    (select group_concat(r.rolename) from sys_userrole uf left join sys_role r on r.id = uf.roleid where uf.userid = u.ID and r.status=1) as ROLENAME,
+    n.type as organizationtype, n.id as organizationid, u.CREATOR, us.USERNAME as CREATORNAME, u.INTIME
+    from SYS_USER u
+    left join view_organization n on n.CODE = u.ORGANIZATIONCODE
+    left join SYS_USER us on us.ID = u.CREATOR
+    where u.USERLEVEL = 1 and u.STATUS = 1 and u.USERTYPE = #{usertype,jdbcType=DECIMAL}
+    <if test="organizationcode != null and organizationcode != ''" >
+        and u.ORGANIZATIONCODE in
+        (
+        SELECT GROUP_CONCAT(c.code)code from( select code from view_organization  
+        where FIND_IN_SET(code,getChildList(#{organizationcode,jdbcType=VARCHAR}))) c
+        GROUP BY CODE       
+         )
+    </if>
+    <if test="organizationname != null and organizationname != ''" >
+        and n.NAME like concat('%' , #{organizationname,jdbcType=VARCHAR} , '%')
+    </if>
+    <if test="username != null and username != ''" >
+        and u.USERNAME like concat('%' , #{username,jdbcType=VARCHAR} , '%')
+    </if>
+    order by u.ID desc
+  </select>
+  <!--查询账号数量 -->
+  <select id="selectCountByName" resultType="java.lang.Integer" >
+    select 
+    count(ID)
+    from SYS_USER where USERNAME = #{username,jdbcType=VARCHAR}
+	and ID != #{id,jdbcType=DECIMAL} and STATUS = 1
+  </select>
+  
+<!-- 通过角色id数组查询相应的账户集合 -->
+  <select id="selectUsersByArray" resultMap="BaseResultMap" >
+     select
+     <include refid="Base_Column_List" />
+     from SYS_USER u    
+     where 
+     u.STATUS= 1
+     and u.ID in
+     <foreach collection="array" item="item" index="index" open="(" close=")" separator=",">
+       #{item,jdbcType=INTEGER}
+     </foreach>
+  </select>
+  
+  <!-- 查询id数组之外的使用的账户集合 -->
+  <select id="selectUsersByArrayOutside" resultMap="BaseResultMap" >
+     select
+     <include refid="Base_Column_List" />
+     from SYS_USER u
+     where u.STATUS= 1 and u.userlevel = 1
+     <if test="null!=array and array.length!=0" >
+        and u.ID not in
+    	 <foreach collection="array" item="item" index="index" open="(" close=")" separator=",">
+       	#{item,jdbcType=INTEGER}
+    	 </foreach>
+     </if>
+     and u.usertype = #{usertype,jdbcType=DECIMAL}
+     <if test="organizationcode != null" >
+        and u.ORGANIZATIONCODE in
+        (select code from view_organization 
+        Where FIND_IN_SET(code,getChildList(#{organizationcode,jdbcType=VARCHAR}))
+       )
+     </if>
+     order by u.ID desc
+  </select>
+  
+   <!-- 查根据组织机构id查询账户集合 -->
+   <select id="SelectUserByOrg" resultMap="BaseResultMap" >
+     select
+     u.*
+     from SYS_USER u
+     left join view_organization o on o.code = u.organizationcode
+     where u.STATUS= 1
+     <if test="orgid != null" >
+     	and o.id= #{orgid,jdbcType=INTEGER} 
+     </if>
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    update SYS_USER set STATUS = 0
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.wssmb.model.User" >
+    insert into SYS_USER (USERNAME, PASSWORD, 
+      REMARK, STATUS, ORGANIZATIONCODE, USERLEVEL
+      )
+    values (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{organizationcode,jdbcType=VARCHAR}, 
+      #{userLevel,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.wssmb.model.User" >
+    insert into SYS_USER
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="username != null" >
+        USERNAME,
+      </if>
+      <if test="password != null" >
+        PASSWORD,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="organizationcode != null" >
+        ORGANIZATIONCODE,
+      </if>
+      <if test="usertype != null" >
+        USERTYPE,
+      </if>
+      <if test="creator != null" >
+        CREATOR,
+      </if>
+        INTIME,
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="organizationcode != null" >
+        #{organizationcode,jdbcType=VARCHAR},
+      </if>
+      <if test="usertype != null" >
+        #{usertype,jdbcType=DECIMAL},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=DECIMAL},
+      </if>
+        sysdate(),
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.wssmb.model.User" >
+    update SYS_USER
+    <set >
+      <if test="username != null" >
+        USERNAME = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="organizationcode != null" >
+        ORGANIZATIONCODE = #{organizationcode,jdbcType=VARCHAR},
+      </if>
+      <if test="usertype != null" >
+        USERTYPE = #{usertype,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.wssmb.model.User" >
+    update SYS_USER
+    set USERNAME = #{username,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      ORGANIZATIONCODE = #{organizationcode,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="resetPassword">
+    update SYS_USER
+    set PASSWORD = #{password,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <select id="selectUserRoles" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select roleid from sys_userrole
+    where userid=#{id,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteUserRoles" parameterType="java.lang.Integer" >
+    delete from SYS_USERROLE where USERID = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insertUserRoles" useGeneratedKeys="false">
+     insert into SYS_USERROLE (USERID, ROLEID) 
+     <foreach collection="roles" index="index" item="item" separator="union all">
+     (
+	   SELECT 
+	   #{userid,jdbcType=INTEGER} USERID,
+	   #{item,jdbcType=INTEGER} ROLEID
+	   FROM dual
+     )
+     </foreach>
+  </insert>
+  
+  <update id="changePassword">
+    update SYS_USER
+    set PASSWORD = #{password,jdbcType=VARCHAR}
+    where USERNAME = #{username,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="changeTheme">
+    update SYS_USER
+    set THEME = #{theme,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+    
+  <!-- 根据账户名获取账户集合，用于自动添加用户时生成账号 -->
+   <select id="SelectUserByName" resultMap="BaseResultMap" >
+     select * from SYS_USER u
+     where 1 = 1
+     <if test="username != null and username != ''" >
+     	and u.USERNAME= #{username,jdbcType=VARCHAR}
+     </if>
+  </select>
+</mapper>

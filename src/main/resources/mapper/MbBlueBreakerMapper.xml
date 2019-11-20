@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.wssmb.mapper.MbBlueBreakerMapper">
+	<resultMap
+		id="BaseResultMap"
+		type="com.ssm.wssmb.model.MbBlueBreaker">
+		<id
+			column="id"
+			property="id"
+			jdbcType="DECIMAL" />
+		<result
+			column="boxCode"
+			property="boxCode"
+			jdbcType="DECIMAL" />
+		<result
+			column="breakerName"
+			property="BreakerName"
+			jdbcType="VARCHAR" />
+		<result
+			column="breakerCode"
+			property="BreakerCode"
+			jdbcType="DECIMAL" />
+		<result
+			column="produce"
+			property="produce"
+			jdbcType="VARCHAR" />
+		<result
+			column="produceTime"
+			property="produceTime"
+			jdbcType="VARCHAR" />
+		<result
+			column="createPerson"
+			property="createPerson"
+			jdbcType="VARCHAR" />
+		<result
+			column="createTime"
+			property="createTime"
+			jdbcType="VARCHAR" />
+		<result
+			column="breakerType"
+			property="lockType"
+			jdbcType="VARCHAR" />
+		<result
+			column="ammeterCode"
+			property="ammeterCode"
+			jdbcType="DECIMAL" />
+		<result
+			column="organizationCode"
+			property="organizationCode"
+			jdbcType="DECIMAL" />
+		<result
+			column="openStatus"
+			property="openStatus"
+			jdbcType="DECIMAL" />
+		<result
+			column="installAddress"
+			property="installAddress"
+			jdbcType="DECIMAL" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, boxCode, breakerName, breakerCode, produce,
+		produceTime,
+		createPerson,
+		createTime,breakerType,ammeterCode,organizationCode,openStatus
+	</sql>
+
+	<select
+		id="selectAll"
+		resultType="com.ssm.wssmb.model.MbBlueBreaker">
+		select * from mb_bluebreaker where 1=1
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+		limit #{startin,jdbcType=DECIMAL},#{endindex,jdbcType=DECIMAL}
+	</select>
+
+	<insert
+		id="addBlueBreaker"
+		parameterType="com.ssm.wssmb.model.MbBlueBreaker">
+		insert into mb_bluebreaker (boxCode,
+		breakerName,breakerCode,produce,produceTime,
+		createPerson,createTime,breakerType,ammeterCode,organizationCode)
+		values (
+		#{boxCode,jdbcType=VARCHAR},
+		#{breakerName,jdbcType=VARCHAR},
+		#{breakerCode,jdbcType=VARCHAR},
+		#{produce,jdbcType=VARCHAR},
+		#{produceTime,jdbcType=VARCHAR},
+		#{createPerson,jdbcType=VARCHAR},
+		#{createTime,jdbcType=VARCHAR},
+		#{breakerType,jdbcType=VARCHAR},
+		#{ammeterCode,jdbcType=DECIMAL},
+		#{organizationCode,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<insert
+		id="addOneBluebreaker"
+		parameterType="com.ssm.wssmb.model.MbBlueBreaker">
+		insert into mb_bluebreaker (boxCode,
+		breakerName,breakerCode,produce,produceTime,
+		createPerson,createTime,breakerType,ammeterCode,organizationCode)
+		values (
+		#{boxCode,jdbcType=VARCHAR},
+		#{breakerName,jdbcType=VARCHAR},
+		#{breakerCode,jdbcType=VARCHAR},
+		#{produce,jdbcType=VARCHAR},
+		#{produceTime,jdbcType=VARCHAR},
+		#{createPerson,jdbcType=VARCHAR},
+		#{createTime,jdbcType=VARCHAR},
+		#{breakerType,jdbcType=VARCHAR},
+		#{ammeterCode,jdbcType=DECIMAL},
+		#{organizationCode,jdbcType=VARCHAR}
+		)
+	</insert>
+	<update
+		id="editBlueBreaker"
+		parameterType="com.ssm.wssmb.model.MbBlueBreaker">
+		update mb_bluebreaker
+		set boxCode=
+		#{boxCode,jdbcType=VARCHAR},
+		breakerName=#{breakerName,jdbcType=VARCHAR},
+		breakerCode=
+		#{breakerCode,jdbcType=VARCHAR},
+		produce=#{produce,jdbcType=VARCHAR},
+		produceTime=#{produceTime,jdbcType=VARCHAR},
+		breakerType=
+		#{breakerType,jdbcType=VARCHAR},
+		ammeterCode=#{ammeterCode,jdbcType=DECIMAL},
+		organizationCode=
+		#{organizationCode,jdbcType=VARCHAR}
+		where id=#{id,jdbcType=DECIMAL}
+	</update>
+
+	<delete
+		id="deleteBlueBreaker"
+		parameterType="java.lang.Integer">
+		delete from mb_bluebreaker
+		where id =
+		#{id,jdbcType=DECIMAL}
+	</delete>
+
+	<select
+		id="queryBlueBreakerByName"
+		resultType="com.ssm.wssmb.model.MbBlueBreaker">
+		select * from mb_bluebreaker where 1=1
+		<if test="inputValue != null and inputValue != ''">
+			and breakerName like #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+		limit #{startin,jdbcType=DECIMAL},#{endindex,jdbcType=DECIMAL}
+	</select>
+
+	<select
+		id="queryBlueBreakerByCode"
+		resultType="com.ssm.wssmb.model.MbBlueBreaker">
+		select * from mb_bluebreaker where 1=1
+		<if test="inputValue != null and inputValue != ''">
+			and breakerCode like #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+		limit #{startin,jdbcType=DECIMAL},#{endindex,jdbcType=DECIMAL}
+	</select>
+
+	<select
+		id="queryTotal"
+		resultType="java.lang.Integer">
+		select id from mb_bluebreaker where 1=1
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+	</select>
+
+	<select
+		id="queryTotalByName"
+		parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		select id from mb_bluebreaker where 1=1
+		<if test="inputValue != null and inputValue != ''">
+			and breakerName like #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+	</select>
+
+	<select
+		id="queryTotalByCode"
+		parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		select id from mb_bluebreaker where 1=1
+		<if test="inputValue != null and inputValue != ''">
+			and breakerCode like #{inputValue,jdbcType=VARCHAR}
+		</if>
+		<if test="organizationId != 0">
+			and IS_PARENT_ORGANIZATION(organizationCode,#{organizationId,jdbcType=INTEGER})=1  
+		</if>
+	</select>
+
+	<select
+		id="getBlueBreakerByAmmeterId"
+		resultType="com.ssm.wssmb.model.MbBlueBreaker">
+		select * from mb_bluebreaker where 1=1
+		<if test="mbAmmeterId != null and mbAmmeterId != ''">
+			and ammeterCode=#{mbAmmeterId,jdbcType=DECIMAL}
+		</if>
+	</select>
+
+	<select
+		id="getBlueBreakerByMeasureId"
+		resultType="com.ssm.wssmb.model.MbBlueBreaker">
+		SELECT b.*, a.ammeterCode as ammeterAddress, a.installAddress FROM mb_bluebreaker b 
+		left join mb_ammeter a on a.id = b.ammeterCode
+		left join mb_concentrator c on c.concentratorId = a.concentratorCode
+		where c.measureId=#{measureId,jdbcType=DECIMAL}
+	</select>
+
+	<select
+		id="getBlueBreakerByConcentratorId"
+		resultType="com.ssm.wssmb.model.MbBlueBreaker">
+		SELECT * FROM mb_bluebreaker WHERE ammeterCode IN (
+		SELECT id FROM mb_ammeter WHERE concentratorCode =#{concentratorId,jdbcType=DECIMAL}
+		)
+	</select>
+	
+	<!-- 更改蓝牙断路器开关状态 -->
+	<update id="changeOpenStatus">
+	    update mb_bluebreaker set openStatus = #{openStatus,jdbcType=INTEGER} where ammeterCode = #{ammeterId,jdbcType=INTEGER}
+	</update>
+</mapper>

@@ -1,0 +1,108 @@
+*
+{
+    font-size: 13px;
+    /* color: #3d3d3d; */
+}
+.loginColor{
+   /*  overflow: hidden; */
+}
+.loginWraper{
+	position:absolute;
+	width:100%;
+	left:0;
+	top:0;
+	bottom:0;
+	right:0;
+	z-index:1;
+	background:url(../../images/Front/FrontLogin_bg.jpg) no-repeat center;
+	background-position: center center; 
+	background-attachment: scroll; 
+	background-size: 100% auto;
+	min-width: 688px;
+    min-height: 490px;
+}
+.loginBoxbg{
+	position: absolute;
+    margin: 0 auto;
+    top: 32%;
+    z-index: 2;
+    left: 0;
+    right: 0;
+    width: 490px;
+    height: 245px;
+    background: url(../../images/Front/FrontLogin_box.png) no-repeat;
+    background-size: cover;
+    background-size: 100% 100%;
+    -webkit-filter: brightness(1.1);
+    filter: brightness(1.1);
+}
+
+.spanall
+{
+    color: rgba(255, 255, 255, 1); 
+    /* font-family: '黑体';  */
+    font-size: 14px;
+}
+
+.user{
+	border-image: url(../../images/Front/FrontLogin_user.png);  
+	border-image-slice: 16 10 15 10 fill;
+}
+
+.pwd{
+	border-image: url(../../images/Front/FrontLogin_pwd.png);
+	border-image-slice: 15 10 17 10 fill;
+}
+
+.user, .pwd{
+	outline: none;
+    width: 224px;
+    height: 32px;
+    padding-right: 35px;
+    color: beige;
+    font-size: 15px;
+    padding-left: 8px;
+    background: transparent;
+    
+    border-image-width: 10px;
+    
+    -webkit-filter: brightness(1.1);
+    filter: brightness(1.1);
+}
+
+.user:-webkit-autofill, .pwd:-webkit-autofill{  
+	-webkit-text-fill-color: beige !important;
+	-webkit-box-shadow: 0 0 0px 244px rgba(255, 255, 255, 0) inset;
+    background-color: rgba(255, 255, 255, 0) !important;
+    background-image: none !important;   
+    transition: background-color 50000s ease-in-out 0s;
+} 
+
+input::-webkit-input-placeholder {
+    color: dimgrey;/* placeholder颜色  */
+    font-size: 13px;/* placeholder字体大小  */
+}
+
+.remeberText
+{
+    position: relative;
+    left: -3px;
+    top: -2px;
+}
+
+#login-btn{	
+	-webkit-filter: brightness(1.2);
+    filter: brightness(1.2);
+}
+
+#login-btn:hover{
+	transform: scale(0.9,0.9);
+	-ms-transform: scale(0.9,0.9); 	/* IE 9 */
+	-moz-transform: scale(0.9,0.9);	/* Firefox */
+	-webkit-transform: scale(0.9,0.9); /* Safari 和 Chrome */
+	-o-transform: scale(0.9,0.9); 	/* Opera */
+	
+	-webkit-filter: brightness(1.5);
+    filter: brightness(1.5);
+}
+
